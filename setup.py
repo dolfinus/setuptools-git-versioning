@@ -39,4 +39,5 @@ setuptools.setup(
             'version_config = setuptools_git_versioning:parse_config',
         ],
     },
+    zip_safe=False
 )
