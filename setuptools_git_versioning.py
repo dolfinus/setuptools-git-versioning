@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 
 from setuptools.dist import Distribution
@@ -179,4 +180,9 @@ def version_from_git(template=DEFAULT_TEMPLATE,
     else:
         t = template
 
-    return t.format(sha=full_sha[:8], tag=tag, ccount=ccount, branch=branch, full_sha=full_sha)
+    version = t.format(sha=full_sha[:8], tag=tag, ccount=ccount, branch=branch, full_sha=full_sha)
+
+    # Ensure local version label only contains permitted characters
+    public, sep, local = version.partition('+')
+    local_sanetized = re.sub(r'[^a-zA-Z0-9.]', '.', local)
+    return public + sep + local_sanetized
