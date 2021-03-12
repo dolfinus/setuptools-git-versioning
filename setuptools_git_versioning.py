@@ -184,5 +184,5 @@ def version_from_git(template=DEFAULT_TEMPLATE,
 
     # Ensure local version label only contains permitted characters
     public, sep, local = version.partition('+')
-    local_sanetized = re.sub(r'[^a-zA-Z0-9.]', '.', local)
-    return public + sep + local_sanetized
+    local_sanitized = re.sub(r'[^a-zA-Z0-9.]', '.', local)
+    return public + sep + local_sanitized
