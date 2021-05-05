@@ -12,11 +12,14 @@ DEFAULT_DEV_TEMPLATE = "{tag}.post{ccount}+git.{sha}"  # type: str
 DEFAULT_DIRTY_TEMPLATE = "{tag}.post{ccount}+git.{sha}.dirty"  # type: str
 DEFAULT_STARTING_VERSION = '0.0.1'
 
+run_in_dir = None
+
 
 def _exec(cmd):  # type: (str) -> List[str]
     try:
         stdout = subprocess.check_output(cmd, shell=True,
-                                         universal_newlines=True)
+                                         universal_newlines=True,
+                                         cwd=run_in_dir)
     except subprocess.CalledProcessError as e:
         stdout = e.output
     lines = stdout.splitlines()
@@ -109,6 +112,8 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
     version_callback = value.get('version_callback', None)
     version_file = value.get('version_file', None)
     count_commits_from_version_file = value.get('count_commits_from_version_file', False)
+    global run_in_dir
+    run_in_dir = value.get('git_run_in_dir', None)
 
     version = version_from_git(
         template=template,
