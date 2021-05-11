@@ -136,7 +136,7 @@ def version_from_git(template=DEFAULT_TEMPLATE,
                      count_commits_from_version_file=False,
                      branch_formatter=None,
                      ):
-    # type: (str, str, str, str, Optional[Any, Callable], Optional[str], bool,Optional[Callable[[str], str]]) -> str
+    # type: (str, str, str, str, Optional[Any, Callable], Optional[str], bool, Optional[Callable[[str], str]]) -> str
 
     # Check if PKG-INFO exists and return value in that if it does
     if os.path.exists('PKG-INFO'):
