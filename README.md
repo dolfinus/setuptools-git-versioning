@@ -334,6 +334,35 @@ Then you decided to release new version:
 - `N` in `.devN` suffix is a number of commits since the last change of a certain file.
 - **Note: every change of this file in the `dev` branch will lead to this `N` suffix to be reset to `0`. Update this file only in the case when you've setting up the next release version!**
 
+### Create version from formatted branch name
+
+You want to create version from formatted branch name. For example if your branch naming does not match pep440.
+
+You can create a function which formats branch name to create version from it:
+Then set it as branch formatter in your `setup.py` file like example below:
+
+```python
+import re
+# Branch naming is like bugfix/issue-1234-bug-title
+def format_branch_name(branch_name):
+    branch_name_regex_groups = re.search('^(bugfix|feature)\/issue-([0-9]+)-\S+', branch_name)
+    try:
+        return branch_name_regex_groups.group(2)
+    except Exception as e:
+        raise Exception('Unable to compute issue number from branch name: ' + branch_name, e)
+
+setuptools.setup(
+    ...
+    version_config={
+        "dev_template": "{branch}.dev{ccount}",
+        "dirty_template": "{branch}.dev{ccount}",
+        "branch_formatter"=format_branch_name
+    },
+    setup_requires=['setuptools-git-versioning'],
+    ...
+)
+```
+
 ## Options
 
 Default options are:
@@ -348,7 +377,8 @@ setuptools.setup(
         "starting_version": "0.0.1",
         "version_callback": None,
         "version_file": None,
-        "count_commits_from_version_file": False
+        "count_commits_from_version_file": False,
+        "branch_formatter": None
     },
     ...
     setup_requires=['setuptools-git-versioning'],
@@ -369,6 +399,8 @@ setuptools.setup(
 - `version_file`: path to VERSION file, to read version from it instead of using `static_version`
 
 - `count_commits_from_version_file`: `True` to fetch `version_file` last commit instead of tag commit, `False` otherwise
+
+- `branch_formatter`: callback to format branch name before calculating version from it
 
 ### Substitions
 
