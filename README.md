@@ -281,7 +281,7 @@ setuptools.setup(
 
 When you'll try to get current version in non-master branch, the content of this file will be returned instead.
 
-### Development releases (prereleases) from another branch
+### Development releases (prereleases) from `dev` branch
 
 For example, current repo state is:
 ```
@@ -334,29 +334,56 @@ Then you decided to release new version:
 - `N` in `.devN` suffix is a number of commits since the last change of a certain file.
 - **Note: every change of this file in the `dev` branch will lead to this `N` suffix to be reset to `0`. Update this file only in the case when you've setting up the next release version!**
 
-### Create version from formatted branch name
 
-You want to create version from formatted branch name. For example if your branch naming does not match pep440.
+### Development releases (prereleases) from `feature`/`bugfix` branch
 
-You can create a function which formats branch name to create version from it:
-Then set it as branch formatter in your `setup.py` file like example below:
+Just like previous example, but you want to make development releases (prereleases) with using branch name in a version template.
 
+If branch name is PEP-440 compatible, like `alpha`, `beta`, `preview` or `rc`, you can just set a template you want:
+```python
+setuptools.setup(
+    ...
+    version_config={
+        "count_commits_from_version_file": True,
+        "dev_template": "{tag}.{branch}{ccount}",
+        "dirty_template": "{tag}.{branch}{ccount}",
+        "version_file": VERSION_FILE
+    },
+    setup_requires=['setuptools-git-versioning'],
+    ...
+)
+```
+
+SO you'll get version number like `1.2.3.alpha4` for commit into an `alpha` branch or `1.2.3.preview4` for commit into a `preview` branch.
+
+If branch name is not PEP-440 compatible, like `feature/ABC-123` or `bugfix/ABC-123`, you'll get version number which `pip` cannot understand.
+
+To fix that you can define a callback which will receive current branch name and return a propery formatted one:
 ```python
 import re
-# Branch naming is like bugfix/issue-1234-bug-title
-def format_branch_name(branch_name):
-    branch_name_regex_groups = re.search('^(bugfix|feature)\/issue-([0-9]+)-\S+', branch_name)
-    try:
-        return branch_name_regex_groups.group(2)
-    except Exception as e:
-        raise Exception('Unable to compute issue number from branch name: ' + branch_name, e)
+
+def format_branch_name(name):
+    # If branch has name like "bugfix/issue-1234-bug-title", take only "1234" part
+    pattern = re.compile('^(bugfix|feature)\/issue-([0-9]+)-\S+')
+    
+    match = pattern.search(name)
+    if not match:
+        return match.group(2)
+    
+    # function is called even if branch name is not used in a current template
+    # just left properly named branches intact
+    if name == "master":
+        return name
+
+    # fail in case of wrong branch names like "bugfix/issue-title"
+    raise ValueError(f"Wrong branch name: {name}")
 
 setuptools.setup(
     ...
     version_config={
         "dev_template": "{branch}.dev{ccount}",
         "dirty_template": "{branch}.dev{ccount}",
-        "branch_formatter"=format_branch_name
+        "branch_formatter": format_branch_name
     },
     setup_requires=['setuptools-git-versioning'],
     ...
@@ -400,7 +427,7 @@ setuptools.setup(
 
 - `count_commits_from_version_file`: `True` to fetch `version_file` last commit instead of tag commit, `False` otherwise
 
-- `branch_formatter`: callback to format branch name before calculating version from it
+- `branch_formatter`: callback to be used for formatting a branch name before template substitution
 
 ### Substitions
 
