@@ -109,6 +109,7 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
     version_callback = value.get('version_callback', None)
     version_file = value.get('version_file', None)
     count_commits_from_version_file = value.get('count_commits_from_version_file', False)
+    branch_formatter = value.get('branch_formatter', None)
 
     version = version_from_git(
         template=template,
@@ -117,7 +118,8 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
         starting_version=starting_version,
         version_callback=version_callback,
         version_file=version_file,
-        count_commits_from_version_file=count_commits_from_version_file
+        count_commits_from_version_file=count_commits_from_version_file,
+        branch_formatter=branch_formatter
     )
     dist.metadata.version = version
 
