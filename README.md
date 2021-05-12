@@ -335,11 +335,13 @@ Then you decided to release new version:
 - **Note: every change of this file in the `dev` branch will lead to this `N` suffix to be reset to `0`. Update this file only in the case when you've setting up the next release version!**
 
 
-### Development releases (prereleases) from `feature`/`bugfix` branch
+### Development releases (prereleases) from any branch (`feature`/`bugfix`/`preview`/`beta`/etc)
 
-Just like previous example, but you want to make development releases (prereleases) with using branch name in a version template.
+Just like previous example, but you want to make development releases (prereleases) with a branch name present in the version number.
 
-If branch name is PEP-440 compatible, like `alpha`, `beta`, `preview` or `rc`, you can just set a template you want:
+In case of branch names which are PEP-440 compatible, you can just use `{branch}` substitution in a version template.
+
+For example, if the branch name is something like `alpha`, `beta`, `preview` or `rc`:
 ```python
 setuptools.setup(
     ...
@@ -353,10 +355,25 @@ setuptools.setup(
     ...
 )
 ```
+Adding a commit to the `alpha` branch will generate a version number like `1.2.3.alpha4`, new commit to the `beta` branch will generate a version number like `1.2.3.beta5` and so on.
 
-SO you'll get version number like `1.2.3.alpha4` for commit into an `alpha` branch or `1.2.3.preview4` for commit into a `preview` branch.
+It is also possible to use branch names prefixed with a major version number, like `1.0-alpha` or `1.1.beta`:
+```python
+setuptools.setup(
+    ...
+    version_config={
+        "count_commits_from_version_file": True,
+        "dev_template": "{branch}{ccount}",
+        "dirty_template": "{branch}{ccount}",
+        "version_file": VERSION_FILE
+    },
+    setup_requires=['setuptools-git-versioning'],
+    ...
+)
+```
+Adding a commit to the `1.0-alpha` branch will generate a version number like `1.0.alpha2`, new commit to the `1.2.beta` branch will generate a version number like `1.2.beta3` and so on.
 
-If branch name is not PEP-440 compatible, like `feature/ABC-123` or `bugfix/ABC-123`, you'll get version number which `pip` cannot understand.
+But if branch name is not PEP-440 compatible at all, like `feature/ABC-123` or `bugfix/ABC-123`, you'll get version number which `pip` cannot understand.
 
 To fix that you can define a callback which will receive current branch name and return a propery formatted one:
 ```python
