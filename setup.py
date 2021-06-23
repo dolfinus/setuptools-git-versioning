@@ -11,7 +11,7 @@ with open(os.path.join(HERE, "requirements.txt"), "r") as f:
     requirements = f.read().split("\n")
 
 setup(
-    name="setuptools-git-versioning",
+    name="lcdp-setuptools-git-versioning",
     version=version_from_git(),
     author="Camas",
     author_email="camas@hotmail.co.uk",
@@ -21,7 +21,7 @@ setup(
     license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/dolfinus/setuptools-git-versioning",
+    url="https://github.com/LeComptoirDesPharmacies/setuptools-git-versioning",
     keywords='setuptools git version-control',
     packages=find_packages(),
     classifiers=[

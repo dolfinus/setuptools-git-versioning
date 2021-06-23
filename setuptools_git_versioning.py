@@ -9,7 +9,6 @@ from six.moves import collections_abc
 
 DEFAULT_TEMPLATE = "{tag}"  # type: str
 DEFAULT_DEV_TEMPLATE = "{tag}.post{ccount}+git.{sha}"  # type: str
-DEFAULT_DIRTY_TEMPLATE = "{tag}.post{ccount}+git.{sha}.dirty"  # type: str
 DEFAULT_STARTING_VERSION = '0.0.1'
 
 
@@ -76,13 +75,6 @@ def get_latest_file_commit(path):  # type: (str) -> Optional[str]
     return None
 
 
-def is_dirty():  # type: () -> bool
-    res = _exec("git status --short")
-    if res:
-        return True
-    return False
-
-
 def count_since(name):  # type: (str) -> Optional[int]
     res = _exec("git rev-list --count HEAD \"^{name}\"".format(name=name))
     if res:
@@ -104,7 +96,6 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
 
     template = value.get('template', DEFAULT_TEMPLATE)
     dev_template = value.get('dev_template', DEFAULT_DEV_TEMPLATE)
-    dirty_template = value.get('dirty_template', DEFAULT_DIRTY_TEMPLATE)
     starting_version = value.get('starting_version', DEFAULT_STARTING_VERSION)
     version_callback = value.get('version_callback', None)
     version_file = value.get('version_file', None)
@@ -114,7 +105,6 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
     version = version_from_git(
         template=template,
         dev_template=dev_template,
-        dirty_template=dirty_template,
         starting_version=starting_version,
         version_callback=version_callback,
         version_file=version_file,
@@ -131,7 +121,6 @@ def read_version_from_file(path):
 
 def version_from_git(template=DEFAULT_TEMPLATE,
                      dev_template=DEFAULT_DEV_TEMPLATE,
-                     dirty_template=DEFAULT_DIRTY_TEMPLATE,
                      starting_version=DEFAULT_STARTING_VERSION,
                      version_callback=None,
                      version_file=None,
@@ -170,19 +159,16 @@ def version_from_git(template=DEFAULT_TEMPLATE,
     else:
         tag_sha = get_sha(tag)
 
-    dirty = is_dirty()
     head_sha = get_sha()
     full_sha = head_sha if head_sha is not None else ''
     ccount = count_since(tag_sha)
     on_tag = head_sha is not None and head_sha == tag_sha and not from_file
     branch = get_branch() if branch_formatter is None else branch_formatter(get_branch())
 
-    if dirty:
-        t = dirty_template
-    elif not on_tag and ccount is not None:
-        t = dev_template
-    else:
+    if on_tag and ccount is not None:
         t = template
+    else:
+        t = dev_template
 
     version = t.format(sha=full_sha[:8], tag=tag, ccount=ccount, branch=branch, full_sha=full_sha)
 
