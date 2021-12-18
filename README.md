@@ -30,12 +30,11 @@ Adding `setup_requires=['setuptools-git-versioning']` somewhere in `setup.py` wi
 
 ## Usage
 ### pyproject.toml
-Just add these lines into your `pyproject.toml`:
+Just add this line into your `pyproject.toml`:
 
 ```toml
 [tool.setuptools_git_versioning]
 ```
-
 
 ### setup.py
 Just add these lines into your `setup.py`:
