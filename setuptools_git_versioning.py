@@ -1,11 +1,11 @@
 import os
 import re
 import subprocess
-import tomli
 from datetime import datetime
 from distutils.errors import DistutilsSetupError
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union
 
+import tomli
 from setuptools.dist import Distribution
 from six.moves import collections_abc
 
@@ -28,7 +28,7 @@ DEFAULT_CONFIG = {
     "version_file": None,
     "count_commits_from_version_file": False,
     "branch_formatter": None,
-    "sort_by": None
+    "sort_by": None,
 }
 
 
