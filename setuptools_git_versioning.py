@@ -5,7 +5,7 @@ from datetime import datetime
 from distutils.errors import DistutilsSetupError
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union
 
-import tomli
+import toml
 from setuptools.dist import Distribution
 from six.moves import collections_abc
 
@@ -118,7 +118,7 @@ def load_config_from_dict(dictionary):  # type: (dict) -> dict
 def load_config_from_toml(file_name):  # type: (str) -> dict
     with open(file_name, encoding="UTF-8", mode="r") as f:
         data = f.read()
-    parsed_file = tomli.loads(data)
+    parsed_file = toml.loads(data)
 
     filtered_file = parsed_file.get("tool", {}).get("setuptools_git_versioning", {})
 
