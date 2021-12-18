@@ -470,7 +470,7 @@ dirty_template = "{tag}.post{ccount}+git.{sha}.dirty"
 starting_version = "0.0.1"
 version_callback = ""
 version_file = ""
-count_commits_from_version_file = False
+count_commits_from_version_file = false
 branch_formatter = ""
 sort_by = ""
 ```
