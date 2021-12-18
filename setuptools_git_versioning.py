@@ -108,7 +108,7 @@ def count_since(name):  # type: (str) -> Optional[int]
     return None
 
 
-def load_config_from_dict(dictionary):  # type: (dict) -> dict
+def load_config_from_dict(dictionary):  # type: (Union[dict, collections_abc.Mapping]) -> dict
     config = {}
     for key, value in DEFAULT_CONFIG.items():
         config[key] = dictionary.get(key, value)

@@ -4,6 +4,7 @@ setuptools<=39.2 ;python_version=='3.3'
 setuptools<45.0;python_version<"3"
 six>=1.13.0
 toml>=0.10.2
+types-toml>=0.10.1
 typing>=3.6,<3.7;python_version=='3.4'
 typing>=3.6,<3.7;python_version=='3.3'
 typing;python_version<"3"
