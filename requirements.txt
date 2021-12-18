@@ -6,3 +6,4 @@ six>=1.13.0
 typing>=3.6,<3.7;python_version=='3.4'
 typing>=3.6,<3.7;python_version=='3.3'
 typing;python_version<"3"
+tomli>=1.0

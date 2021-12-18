@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import tomli
 from datetime import datetime
 from distutils.errors import DistutilsSetupError
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union
@@ -17,6 +18,18 @@ DEFAULT_DIRTY_TEMPLATE = "{tag}.post{ccount}+git.{sha}.dirty"  # type: str
 DEFAULT_STARTING_VERSION = "0.0.1"
 ENV_VARS_REGEXP = re.compile(r"\{env:([^:}]+):?([^}]+}?)?\}", re.IGNORECASE | re.UNICODE)  # type: Pattern
 TIMESTAMP_REGEXP = re.compile(r"\{timestamp:?([^:}]+)?\}", re.IGNORECASE | re.UNICODE)  # type: Pattern
+
+DEFAULT_CONFIG = {
+    "template": DEFAULT_TEMPLATE,
+    "dev_template": DEFAULT_DEV_TEMPLATE,
+    "dirty_template": DEFAULT_DIRTY_TEMPLATE,
+    "starting_version": DEFAULT_STARTING_VERSION,
+    "version_callback": None,
+    "version_file": None,
+    "count_commits_from_version_file": False,
+    "branch_formatter": None,
+    "sort_by": None
+}
 
 
 def _exec(cmd):  # type: (str) -> List[str]
@@ -95,6 +108,37 @@ def count_since(name):  # type: (str) -> Optional[int]
     return None
 
 
+def load_config_from_dict(dictionary):  # type: (dict) -> dict
+    config = {}
+    for key, value in DEFAULT_CONFIG.items():
+        config[key] = dictionary.get(key, value)
+    return config
+
+
+def load_config_from_toml(file_name):  # type: (str) -> dict
+    with open(file_name, encoding="UTF-8", mode="r") as f:
+        data = f.read()
+    parsed_file = tomli.loads(data)
+
+    filtered_file = parsed_file.get("tool", {}).get("setuptools_git_versioning", {})
+
+    config = load_config_from_dict(filtered_file)
+
+    return config
+
+
+def infer_version(dist):  # type: (Distribution) -> None
+    pyproject = "pyproject.toml"
+    if not os.path.isfile(pyproject):
+        return
+
+    config = load_config_from_toml(pyproject)
+
+    version = version_from_git(**config)
+
+    dist.metadata.version = version
+
+
 def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
     if isinstance(value, bool):
         if value:
@@ -107,28 +151,13 @@ def parse_config(dist, _, value):  # type: (Distribution, Any, Any) -> None
     if not isinstance(value, collections_abc.Mapping):
         raise DistutilsSetupError("Config in the wrong format")
 
-    template = value.get("template", DEFAULT_TEMPLATE)
-    dev_template = value.get("dev_template", DEFAULT_DEV_TEMPLATE)
-    dirty_template = value.get("dirty_template", DEFAULT_DIRTY_TEMPLATE)
-    starting_version = value.get("starting_version", DEFAULT_STARTING_VERSION)
-    version_callback = value.get("version_callback", None)
-    version_file = value.get("version_file", None)
-    count_commits_from_version_file = value.get("count_commits_from_version_file", False)
-    branch_formatter = value.get("branch_formatter", None)
-    sort_by = value.get("sort_by", None)
+    config = load_config_from_dict(value)
 
-    version = version_from_git(
-        template=template,
-        dev_template=dev_template,
-        dirty_template=dirty_template,
-        starting_version=starting_version,
-        version_callback=version_callback,
-        version_file=version_file,
-        count_commits_from_version_file=count_commits_from_version_file,
-        branch_formatter=branch_formatter,
-        sort_by=sort_by,
-    )
+    version = version_from_git(**config)
+
     dist.metadata.version = version
+
+    infer_version(dist)
 
 
 def read_version_from_file(path):  # type: (Union[str, os.PathLike]) -> str
