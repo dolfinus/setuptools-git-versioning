@@ -1,0 +1,7 @@
+[run]
+branch = True
+source_pkgs = setuptools_git_versioning
+omit =
+    tests/*
+parallel = true
+data_file = reports/.coverage

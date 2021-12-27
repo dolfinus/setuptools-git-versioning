@@ -1,0 +1,6 @@
+coverage
+flake8>=3.8; python_version=="2.7"
+flake8>=3.8; python_version>="3.5"
+pytest
+pytest-rerunfailures<9.0; python_version=="2.7"
+pytest-rerunfailures; python_version>="3.5"

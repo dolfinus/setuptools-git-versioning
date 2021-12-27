@@ -31,7 +31,8 @@ jobs:
     if: ${{ needs.check_duplicate_runs.outputs.should_skip != 'true' }}
     strategy:
       matrix:
-        python-version: ['2.7', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
+        python-version: ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
+      fail-fast: false
 
     steps:
     - name: Checkout code
@@ -49,9 +50,9 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-python-${{ matrix.python-version }}-pip-${{ hashFiles('requirements.txt') }}
+        key: ${{ runner.os }}-python-${{ matrix.python-version }}-pip-${{ hashFiles('requirements*.txt') }}
         restore-keys: |
-          ${{ runner.os }}-python-${{ matrix.python-version }}-pip-${{ hashFiles('requirements.txt') }}
+          ${{ runner.os }}-python-${{ matrix.python-version }}-pip-${{ hashFiles('requirements*.txt') }}
           ${{ runner.os }}-python-${{ matrix.python-version }}-pip-
           ${{ runner.os }}-python
           ${{ runner.os }}-
@@ -60,23 +61,28 @@ jobs:
       run: python -m pip install --upgrade pip setuptools wheel
 
     - name: Install dependencies
-      run: pip install -I "flake8<=2.6" -r requirements.txt
-      if: matrix.python-version == '3.3' || matrix.python-version == '3.4'
-
-    - name: Install dependencies
-      run: pip install "flake8>=3.8" -r requirements.txt
-      if: matrix.python-version != '3.3' && matrix.python-version != '3.4'
-
-    - name: Run flake8
-      run: flake8 --count --ignore=F401 --max-line-length=120 .
-      if: matrix.python-version == '3.3' || matrix.python-version == '3.4'
+      run: pip install -I -r requirements.txt -r requirements-test.txt
 
     - name: Run flake8
       run: flake8 --count --max-line-length=120 .
-      if: matrix.python-version != '3.3' && matrix.python-version != '3.4'
+
+    - name: Run tests
+      run: |
+        mkdir reports/
+        pip install -e .
+        coverage run -m pytest --reruns 5
 
     - name: Build package
       run: python setup.py bdist_wheel sdist
+
+    - name: Uninstall package
+      run: pip uninstall -y setuptools-git-versioning
+
+    - name: Upload coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage ${{ matrix.python-version }}
+        path: reports/.coverage*
 
   all_done:
     name: Tests done (${{ github.event_name }})
@@ -84,5 +90,49 @@ jobs:
     needs: [tests]
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-python-3.10-pip-${{ hashFiles('requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-python-3.10-pip-${{ hashFiles('requirements*.txt') }}
+          ${{ runner.os }}-python-3.10-pip-
+          ${{ runner.os }}-python
+          ${{ runner.os }}-
+
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip setuptools wheel
+
+    - name: Install dependencies
+      run: pip install -I -r requirements.txt -r requirements-test.txt
+
+    - name: Download all coverage reports
+      uses: actions/download-artifact@v2
+      with:
+        path: reports
+
+    - name: Move coverage reports to the root folder
+      run: find reports -type f -exec mv '{}' reports \;
+
+    - name: Combine coverage
+      run: |
+        coverage combine
+        coverage xml -o reports/coverage.xml -i
+
+    - name: Check coverage
+      uses: codecov/codecov-action@v2
+      with:
+        files: ./reports/coverage.xml
+        fail_ci_if_error: false
+
     - name: All done
       run: echo 1

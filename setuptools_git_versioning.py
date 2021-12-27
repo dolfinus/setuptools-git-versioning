@@ -3,21 +3,18 @@ import re
 import subprocess
 from datetime import datetime
 from distutils.errors import DistutilsSetupError
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 import toml
 from setuptools.dist import Distribution
 from six.moves import collections_abc
 
-if TYPE_CHECKING:
-    from re import Pattern
-
 DEFAULT_TEMPLATE = "{tag}"  # type: str
 DEFAULT_DEV_TEMPLATE = "{tag}.post{ccount}+git.{sha}"  # type: str
 DEFAULT_DIRTY_TEMPLATE = "{tag}.post{ccount}+git.{sha}.dirty"  # type: str
 DEFAULT_STARTING_VERSION = "0.0.1"
-ENV_VARS_REGEXP = re.compile(r"\{env:([^:}]+):?([^}]+}?)?\}", re.IGNORECASE | re.UNICODE)  # type: Pattern
-TIMESTAMP_REGEXP = re.compile(r"\{timestamp:?([^:}]+)?\}", re.IGNORECASE | re.UNICODE)  # type: Pattern
+ENV_VARS_REGEXP = re.compile(r"\{env:([^:}]+):?([^}]+}?)?\}", re.IGNORECASE | re.UNICODE)  # type: re.Pattern
+TIMESTAMP_REGEXP = re.compile(r"\{timestamp:?([^:}]+)?\}", re.IGNORECASE | re.UNICODE)  # type: re.Pattern
 
 DEFAULT_CONFIG = {
     "template": DEFAULT_TEMPLATE,
