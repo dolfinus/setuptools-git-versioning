@@ -1,5 +1,6 @@
 import os
 from setuptools import setup, find_packages
+from setuptools_git_versioning import version_from_git
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,7 +12,7 @@ with open(os.path.join(HERE, "requirements.txt")) as f:
 
 setup(
     name="setuptools-git-versioning",
-    version_config=True,
+    version=version_from_git(),
     author="Camas",
     author_email="camas@hotmail.co.uk",
     maintainer="dolfinus",
@@ -41,7 +42,6 @@ setup(
     python_requires=">=2.7,!=3.1,!=3.2,!=3.3,!=3.4",
     py_modules=["setuptools_git_versioning"],
     install_requires=requirements,
-    setup_requires=["setuptools-git-versioning"],
     entry_points={
         "distutils.setup_keywords": [
             "version_config = setuptools_git_versioning:parse_config",

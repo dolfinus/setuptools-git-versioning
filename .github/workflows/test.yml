@@ -66,14 +66,14 @@ jobs:
     - name: Run flake8
       run: flake8 --count --max-line-length=120 .
 
+    - name: Build package
+      run: python setup.py bdist_wheel sdist
+
     - name: Run tests
       run: |
         mkdir reports/
-        pip install -e .
+        pip install dist/*.whl
         coverage run -m pytest --reruns 5
-
-    - name: Build package
-      run: python setup.py bdist_wheel sdist
 
     - name: Uninstall package
       run: pip uninstall -y setuptools-git-versioning
