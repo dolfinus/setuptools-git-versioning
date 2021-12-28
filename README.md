@@ -41,9 +41,7 @@ Just add this line into your `pyproject.toml`:
 Just add these lines into your `setup.py`:
 
 ```python
-setuptools.setup(
-    setuptools_git_versioning=True, setup_requires=["setuptools-git-versioning"], ...
-)
+setuptools.setup(version_config=True, setup_requires=["setuptools-git-versioning"], ...)
 ```
 
 ### Release version = git tag
