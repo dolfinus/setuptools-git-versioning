@@ -20,7 +20,7 @@ repos:
   - id: trailing-whitespace
   - id: detect-private-key
 - repo: https://github.com/Lucas-C/pre-commit-hooks
-  rev: v1.1.10
+  rev: v1.1.11
   hooks:
   - id: remove-tabs
 - repo: https://github.com/codespell-project/codespell
@@ -49,12 +49,12 @@ repos:
   hooks:
   - id: pyupgrade
 - repo: https://github.com/psf/black
-  rev: 21.12b0
+  rev: 22.1.0
   hooks:
   - id: black
     language_version: python3
 - repo: https://github.com/asottile/blacken-docs
-  rev: v1.12.0
+  rev: v1.12.1
   hooks:
   - id: blacken-docs
 - repo: https://github.com/pre-commit/mirrors-mypy
