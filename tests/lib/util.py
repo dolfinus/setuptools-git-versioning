@@ -147,7 +147,7 @@ def create_pyproject_toml(
             """
         ),
         commit=False,
-        **kwargs
+        **kwargs,
     )
 
     cfg = {}  # type: Dict[str, Any]
@@ -215,7 +215,7 @@ def create_setup_py(
                 coverage.save()
             """
         ).format(cfg=cfg),
-        **kwargs
+        **kwargs,
     )
 
 
