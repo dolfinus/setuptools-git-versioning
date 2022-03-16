@@ -7,10 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(HERE)
 
 
-def infer_version():
-    from setuptools_git_versioning import version_from_git
-
-    return version_from_git()
+from setuptools_git_versioning import version_from_git  # noqa: E402
 
 
 def parse_requirements(file_content):
@@ -26,7 +23,7 @@ with open(os.path.join(HERE, "requirements.txt")) as f:
 
 setup(
     name="setuptools-git-versioning",
-    version=infer_version(),
+    version=version_from_git,
     author="dolfinus",
     author_email="martinov.m.s.8@gmail.com",
     description="Use git repo data for building a version number according PEP-440",
