@@ -101,6 +101,10 @@ jobs:
         python setup.py --version
         python setup.py bdist_wheel sdist
 
+    - name: Test installing w/o binaries
+      run: |
+        pip install -e . --no-binary :all:
+
     - name: Run tests
       run: |
         mkdir reports/
