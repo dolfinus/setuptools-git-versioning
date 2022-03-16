@@ -1,8 +1,16 @@
 import os
-from setuptools import setup, find_packages
-from setuptools_git_versioning import version_from_git
+import sys
+
+from setuptools import find_packages, setup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(HERE)
+
+
+def infer_version():
+    from setuptools_git_versioning import version_from_git
+
+    return version_from_git()
 
 
 def parse_requirements(file_content):
@@ -18,7 +26,7 @@ with open(os.path.join(HERE, "requirements.txt")) as f:
 
 setup(
     name="setuptools-git-versioning",
-    version=version_from_git(),
+    version=infer_version(),
     author="dolfinus",
     author_email="martinov.m.s.8@gmail.com",
     description="Use git repo data for building a version number according PEP-440",
