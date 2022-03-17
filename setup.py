@@ -23,7 +23,7 @@ with open(os.path.join(HERE, "requirements.txt")) as f:
 
 setup(
     name="setuptools-git-versioning",
-    version=version_from_git,
+    version=version_from_git(),
     author="dolfinus",
     author_email="martinov.m.s.8@gmail.com",
     description="Use git repo data for building a version number according PEP-440",
