@@ -123,7 +123,7 @@ jobs:
       run: find reports -type f -exec mv '{}' reports \;
 
     - name: Check coverage
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         directory: ./reports
         fail_ci_if_error: true
