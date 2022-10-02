@@ -100,7 +100,7 @@ jobs:
         coverage xml -o reports/coverage-${{ matrix.python-version }}.xml -i
 
     - name: Upload coverage results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: code-coverage-${{ matrix.python-version }}
         path: reports/coverage-${{ matrix.python-version }}.xml
