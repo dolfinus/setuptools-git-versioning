@@ -24,6 +24,7 @@ DEFAULT_DEV_TEMPLATE = "{tag}.post{ccount}+git.{sha}"
 DEFAULT_DIRTY_TEMPLATE = "{tag}.post{ccount}+git.{sha}.dirty"
 DEFAULT_STARTING_VERSION = "0.0.1"
 DEFAULT_SORT_BY = "creatordate"
+DEFAULT_TAG_FILTER = None
 ENV_VARS_REGEXP = re.compile(r"\{env:(?P<name>[^:}]+):?(?P<default>[^}]+\}*)?\}", re.IGNORECASE | re.UNICODE)
 TIMESTAMP_REGEXP = re.compile(r"\{timestamp:?(?P<fmt>[^:}]+)?\}", re.IGNORECASE | re.UNICODE)
 
@@ -55,6 +56,7 @@ DEFAULT_CONFIG = {
     "tag_formatter": None,
     "branch_formatter": None,
     "sort_by": DEFAULT_SORT_BY,
+    "tag_filter": DEFAULT_TAG_FILTER,
 }
 
 log = logging.getLogger(__name__)
@@ -96,8 +98,16 @@ def get_branch_tags(*args, **kwargs) -> list[str]:
     return get_tags(*args, **kwargs)
 
 
-def get_tags(sort_by: str = DEFAULT_SORT_BY, root: str | os.PathLike | None = None) -> list[str]:
+def get_tags(
+    sort_by: str = DEFAULT_SORT_BY,
+    filter_fxn: Callable[[str], str] | None = None,
+    root: str | os.PathLike | None = None,
+) -> list[str]:
     tags = _exec(f"git tag --sort=-{sort_by} --merged", root=root)
+    if filter_fxn:
+        # pull the tags that don't start with tag_prefix out of the list
+        mytags = [n for n in list(map(filter_fxn, tags)) if n]
+        return mytags
     if tags:
         return tags
     return []
@@ -417,6 +427,39 @@ def load_branch_formatter(
         raise ValueError("Cannot parse branch_formatter") from e
 
 
+def load_tag_filter(
+    tag_filter: str | Callable[[str], str],
+    package_name: str | None = None,
+    root: str | os.PathLike | None = None,
+) -> Callable[[str], str]:
+    log.log(INFO, "Parsing tag_filter %r of type %r", tag_filter, type(tag_filter).__name__)
+
+    if callable(tag_filter):
+        log.log(DEBUG, "Value is callable with signature %s", inspect.Signature.from_callable(tag_filter))
+        return tag_filter
+
+    try:
+        return load_callable(tag_filter, package_name, root=root)
+    except (ImportError, NameError) as e:
+        log.warning("tag_filter is not a valid function reference: %s", e)
+
+    try:
+        pattern = re.compile(tag_filter)
+
+        def formatter(tag: str) -> str:
+            match = pattern.match(tag)
+            if match:
+                log.error("Matched %s", tag)
+                return tag
+            else:
+                return None
+
+        return formatter
+    except re.error as e:
+        log.error("tag_filter is not valid regexp: %s", e)
+        raise ValueError("Cannot parse tag_filter") from e
+
+
 # TODO: return Version object instead of str
 def get_version_from_callback(
     version_callback: str | Callable[[], str],
@@ -477,8 +520,9 @@ def version_from_git(
     version_callback: str | Callable[[], str] | None = None,
     version_file: str | os.PathLike | None = None,
     count_commits_from_version_file: bool = False,
-    tag_formatter: Callable[[str], str] | None = None,
+    tag_formatter: Callable[[str], str] | str | None = None,
     branch_formatter: Callable[[str], str] | None = None,
+    tag_filter: Callable[[str], str] | str | None = None,
     sort_by: str = DEFAULT_SORT_BY,
     root: str | os.PathLike | None = None,
 ) -> str:
@@ -500,10 +544,14 @@ def version_from_git(
             )
         return get_version_from_callback(version_callback, package_name, root=root)
 
+    filter_fxn = None
+    if tag_filter:
+        filter_fxn = load_tag_filter(tag_filter=tag_filter, package_name=package_name, root=root)
+
     from_file = False
     log.log(INFO, "Getting latest tag")
     log.log(DEBUG, "Sorting tags by %r", sort_by)
-    tag = get_tag(sort_by=sort_by, root=root)
+    tag = get_tag(sort_by=sort_by, root=root, filter_fxn=filter_fxn)
 
     if tag is None:
         log.log(INFO, "No tag, checking for 'version_file'")

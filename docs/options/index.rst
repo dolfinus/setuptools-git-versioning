@@ -17,3 +17,4 @@ Config options
     sort_by
     branch_formatter
     tag_formatter
+    tag_filter
