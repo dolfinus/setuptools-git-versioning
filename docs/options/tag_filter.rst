@@ -59,7 +59,7 @@ Possible values
 
 - function full name in format ``"some.module:function_name"``
 
-    Function should have signature ``(str) -> str``. It accepts original tag name and returns
+    Function should have signature ``(str) -> Optional[str]``. It accepts original tag name and returns
     the tag name if it should be in the list and None if it is to be filtered out.
 
     .. warning::

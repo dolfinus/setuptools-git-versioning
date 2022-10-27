@@ -13,7 +13,7 @@ import warnings
 from datetime import datetime
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from deprecated import deprecated
 from packaging.version import Version
@@ -100,7 +100,7 @@ def get_branch_tags(*args, **kwargs) -> list[str]:
 
 def get_tags(
     sort_by: str = DEFAULT_SORT_BY,
-    filter_fxn: Callable[[str], str] | None = None,
+    filter_fxn: Callable[[str], Optional[str]] | None = None,
     root: str | os.PathLike | None = None,
 ) -> list[str]:
     tags = _exec(f"git tag --sort=-{sort_by} --merged", root=root)
@@ -446,7 +446,7 @@ def load_tag_filter(
     try:
         pattern = re.compile(tag_filter)
 
-        def formatter(tag: str) -> str:
+        def formatter(tag: str) -> Optional[str]:
             match = pattern.match(tag)
             if match:
                 log.error("Matched %s", tag)
@@ -522,7 +522,7 @@ def version_from_git(
     count_commits_from_version_file: bool = False,
     tag_formatter: Callable[[str], str] | str | None = None,
     branch_formatter: Callable[[str], str] | None = None,
-    tag_filter: Callable[[str], str] | str | None = None,
+    tag_filter: Callable[[str], Optional[str]] | str | None = None,
     sort_by: str = DEFAULT_SORT_BY,
     root: str | os.PathLike | None = None,
 ) -> str:
