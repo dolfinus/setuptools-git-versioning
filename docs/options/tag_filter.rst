@@ -23,7 +23,7 @@ Type
 
 Default value
 ^^^^^^^^^^^^^
-`None`
+``None``
 
 Usage
 ^^^^^^
@@ -32,24 +32,24 @@ Set when multiple products are tagged in a single repo.
 
 If, for example, your repo has:
 
-- `product_x/1.2.0`
-- `product_x/1.2.1`
-- `product_x/1.3.0`
-- `product_y/2.0.0`
-- `product_y/2.1.0`
+- ``product_x/1.2.0``
+- ``product_x/1.2.1``
+- ``product_x/1.3.0``
+- ``product_y/2.0.0``
+- ``product_y/2.1.0``
 
-and you only want versions from `product_y`, simply set:
+and you only want versions from ``product_y``, simply set:
 
 .. code:: toml
 
-    tag_filter = "product_y/.*"
+    tag_filter = "product_y/(?P<tag>.*)"
 
-This will limit the tags considered to those that start with `product_y`.
+This will limit the tags considered to those that start with ``product_y``.
 
 You will likely still need to construct a :ref:`tag-formatter-option` that
-takes the entire tag into consideration.  This will be similar to the regexp
-or function used by the tag_filter, but must return just the part of the tag
-that is used for the version.
+takes the entire tag into consideration.  To make thing easier, you can often
+use the same regexp/callback for the filter that you would use for the
+formatter.
 
 Possible values
 ^^^^^^^^^^^^^^^
@@ -59,14 +59,21 @@ Possible values
 
 - function full name in format ``"some.module:function_name"``
 
-    Function should have signature ``(str) -> str | None``. It accepts original tag name and returns
-    the tag name if it should be in the list and None if it is to be filtered out.
+    Function should have signature ``(str) -> str | None``. It accepts original
+    tag name and returns the tag name (or subset thereof) if it should be in
+    the list and None if it is to be filtered out. When a formatter is
+    required, it it often easiest to use the same function for both the filter
+    and the formatter, following the rules for the formatter function.
 
     .. warning::
 
         Exception will be raised if module or function/lambda is missing or has invalid signature
 
-- regexp like ``"tag-prefix/.*"``
+- regexp like ``"tag-prefix/.*"`` or ``"tag-prefix/(?P<tag>.*)"``
+
+
+    The ``<tag>`` group isn't required for the filter, but makes it simpler to
+    share with the formatter option.
 
     .. warning::
 
