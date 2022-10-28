@@ -70,7 +70,7 @@ def test_tag_filter_external(repo, create_config, tag, version, filter_regex):
 
             def tag_filter(tag: str) -> str | None:
                 m = re.match(r"{filter_regex}", tag)
-                
+
                 if m:
                     return m.group('tag')
                 return None

@@ -302,7 +302,6 @@ def test_tag_sort_by_tag_date(repo, create_config, message):
     assert get_version(repo).startswith("1.1")
 
 
-
 @pytest.mark.parametrize("sort_by", [None, "creatordate"])
 @pytest.mark.parametrize("message", ["", "Some message"])
 def test_tag_sort_by_create_date(repo, create_config, message, sort_by):

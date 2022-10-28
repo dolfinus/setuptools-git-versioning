@@ -50,7 +50,7 @@ def create_commit(
     options = ""
 
     if dt is not None:
-        # Store committer date in case it was set somewhere eles
+        # Store committer date in case it was set somewhere else
         original_committer_date = os.environ.get("GIT_COMMITTER_DATE", None)
 
         options += f"--date {dt.isoformat()}"
