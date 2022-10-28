@@ -106,7 +106,7 @@ def get_tags(
     tags = _exec(f"git tag --sort=-{sort_by} --merged", root=root)
     if filter_callback:
         # pull the tags that don't start with tag_prefix out of the list
-        mytags = [n for n in list(map(filter_callback, tags)) if n]
+        mytags = list(filter(filter_callback, tags))
         return mytags
     if tags:
         return tags
