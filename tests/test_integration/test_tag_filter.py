@@ -1,7 +1,6 @@
 import os
 import subprocess
 import textwrap
-import time
 from datetime import datetime, timedelta
 
 import pytest
@@ -29,10 +28,7 @@ pytestmark = pytest.mark.all
     ],
 )
 def test_tag_filter(repo, create_config, tag_filter, version):
-    if tag_filter:
-        create_config(repo, {"tag_filter": tag_filter, "tag_formatter": tag_filter})
-    else:
-        create_config(repo)
+    create_config(repo, {"tag_filter": tag_filter, "tag_formatter": tag_filter})
 
     commits = {}
     tags_to_commit = [
@@ -45,46 +41,38 @@ def test_tag_filter(repo, create_config, tag_filter, version):
 
     for i, tag in enumerate(tags_to_commit):
         create_file(repo, commit=False)
-        dt = datetime.now() - timedelta(days=len(tags_to_commit) - i)
+        dt = datetime.now() - timedelta(days=10) + timedelta(days=i)
         create_commit(repo, "Some commit", dt=dt)
         commits[tag] = get_sha(repo)
-        time.sleep(1)
-
-    tags_to_create = [
-        "product_x/1.0.0",
-        "product_x/1.0.2",
-        "product_x/1.1.0",
-        "product_y/1.1.10",
-        "product_z/foo/1.1.1",
-    ]
-
-    for tag in tags_to_create:
         create_tag(repo, tag, message="", commit=commits[tag])
-        time.sleep(1)
 
     assert get_version(repo).startswith(version)
 
 
 @pytest.mark.parametrize(
-    "tag, version, filter_regex, tag_format",
+    "tag, version, filter_regex",
     [
-        ("1.0.0", "1.0.0", r"[\d.]+", None),
-        ("release/1.0.0", "0.0.1", r"[\d.]+", None),
-        ("unknown", "0.0.1", r"[\d.]+", None),
-        ("foo/bar/1.0.3-123", "1.0.3.123", r"foo/bar/.*", r"foo/bar/(?P<tag>.*)"),
+        ("1.0.0", "1.0.0", r"(?P<tag>[\d.]+)"),
+        ("release/1.0.0", "0.0.1", r"(?P<tag>[\d.]+)"),
+        ("unknown", "0.0.1", r"(?P<tag>[\d.]+)"),
+        ("foo/bar/1.0.3-123", "1.0.3.123", r"foo/bar/(?P<tag>.*)"),
     ],
 )
-def test_tag_filter_external(repo, create_config, tag, version, filter_regex, tag_format):
+def test_tag_filter_external(repo, create_config, tag, version, filter_regex):
     create_file(
         repo,
         "util.py",
         textwrap.dedent(
             rf"""
+            from __future__ import annotations # For `str | None` type syntax
+
             import re
 
-            def tag_filter(tag: str) -> str:
-                if re.match(r"{filter_regex}", tag):
-                    return tag
+            def tag_filter(tag: str) -> str | None:
+                m = re.match(r"{filter_regex}", tag)
+                
+                if m:
+                    return m.group('tag')
                 return None
             """
         ),
@@ -94,7 +82,7 @@ def test_tag_filter_external(repo, create_config, tag, version, filter_regex, ta
         repo,
         {
             "tag_filter": "util:tag_filter",
-            "tag_formatter": tag_format,
+            "tag_formatter": "util:tag_filter",
         },
     )
     create_tag(repo, tag)
