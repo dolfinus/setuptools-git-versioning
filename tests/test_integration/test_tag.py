@@ -1,7 +1,6 @@
 import subprocess
 from datetime import datetime, timedelta
 import pytest
-import time
 
 from tests.lib.util import (
     create_file,
