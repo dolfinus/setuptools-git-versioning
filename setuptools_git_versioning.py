@@ -100,13 +100,13 @@ def get_branch_tags(*args, **kwargs) -> list[str]:
 
 def get_tags(
     sort_by: str = DEFAULT_SORT_BY,
-    filter_fxn: Callable[[str], str | None] | None = None,
+    filter_callback: Callable[[str], str | None] | None = None,
     root: str | os.PathLike | None = None,
 ) -> list[str]:
     tags = _exec(f"git tag --sort=-{sort_by} --merged", root=root)
-    if filter_fxn:
+    if filter_callback:
         # pull the tags that don't start with tag_prefix out of the list
-        mytags = [n for n in list(map(filter_fxn, tags)) if n]
+        mytags = [n for n in list(map(filter_callback, tags)) if n]
         return mytags
     if tags:
         return tags
@@ -544,14 +544,14 @@ def version_from_git(
             )
         return get_version_from_callback(version_callback, package_name, root=root)
 
-    filter_fxn = None
+    filter_callback = None
     if tag_filter:
-        filter_fxn = load_tag_filter(tag_filter=tag_filter, package_name=package_name, root=root)
+        filter_callback = load_tag_filter(tag_filter=tag_filter, package_name=package_name, root=root)
 
     from_file = False
     log.log(INFO, "Getting latest tag")
     log.log(DEBUG, "Sorting tags by %r", sort_by)
-    tag = get_tag(sort_by=sort_by, root=root, filter_fxn=filter_fxn)
+    tag = get_tag(sort_by=sort_by, root=root, filter_callback=filter_callback)
 
     if tag is None:
         log.log(INFO, "No tag, checking for 'version_file'")
