@@ -29,7 +29,7 @@ def rand_sha() -> str:
 
 
 def execute(cwd: str | os.PathLike, cmd: str, **kwargs) -> str:
-    log.info(f"Executing '{cmd}' at '{cwd}'")
+    log.critical(f"Executing '{cmd}' at '{cwd}'")
     return subprocess.check_output(cmd, cwd=cwd, shell=True, universal_newlines=True, **kwargs)  # nosec
 
 
@@ -48,9 +48,27 @@ def create_commit(
     **kwargs,
 ) -> str:
     options = ""
+
     if dt is not None:
+        # Store committer date in case it was set somewhere eles
+        original_committer_date = os.environ.get("GIT_COMMITTER_DATE", None)
+
         options += f"--date {dt.isoformat()}"
-    return execute(cwd, f'git commit -m "{message}" {options}', **kwargs)
+        # The committer date is what is used to determine sort order for tags, etc
+        os.environ["GIT_COMMITTER_DATE"] = f"--date {dt.isoformat()}"
+
+    return_value = execute(cwd, f'git commit -m "{message}" {options}', **kwargs)
+
+    # Return committer date env var to prior value if set
+    if dt is not None:
+        if original_committer_date is None:
+            # unset the var
+            del os.environ["GIT_COMMITTER_DATE"]
+        else:
+            # restore previous value
+            os.environ["GIT_COMMITTER_DATE"] = original_committer_date
+
+    return return_value
 
 
 def create_tag(
