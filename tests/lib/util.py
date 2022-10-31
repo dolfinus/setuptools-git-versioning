@@ -29,7 +29,7 @@ def rand_sha() -> str:
 
 
 def execute(cwd: str | os.PathLike, cmd: str, **kwargs) -> str:
-    log.critical(f"Executing '{cmd}' at '{cwd}'")
+    log.info(f"Executing '{cmd}' at '{cwd}'")
     return subprocess.check_output(cmd, cwd=cwd, shell=True, universal_newlines=True, **kwargs)  # nosec
 
 
