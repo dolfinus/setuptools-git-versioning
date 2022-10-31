@@ -455,7 +455,7 @@ def load_tag_filter(
         return tag_filter
 
     try:
-        return load_callable(tag_filter, package_name, root=root)
+        return _load_callable(tag_filter, package_name, root=root)
     except (ImportError, NameError) as e:
         log.warning("tag_filter is not a valid function reference: %s", e)
 
