@@ -443,7 +443,7 @@ def _load_branch_formatter(
         raise ValueError("Cannot parse branch_formatter") from e
 
 
-def load_tag_filter(
+def _load_tag_filter(
     tag_filter: str | Callable[[str], str | None],
     package_name: str | None = None,
     root: str | os.PathLike | None = None,
@@ -562,7 +562,7 @@ def version_from_git(
 
     filter_callback = None
     if tag_filter:
-        filter_callback = load_tag_filter(tag_filter=tag_filter, package_name=package_name, root=root)
+        filter_callback = _load_tag_filter(tag_filter=tag_filter, package_name=package_name, root=root)
 
     from_file = False
     log.log(INFO, "Getting latest tag")
