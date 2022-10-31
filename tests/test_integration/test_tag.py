@@ -1,6 +1,7 @@
 import subprocess
 from datetime import datetime, timedelta
 import pytest
+import time
 
 from tests.lib.util import (
     create_file,
@@ -297,8 +298,16 @@ def test_tag_sort_by_tag_date(repo, create_config, message):
 
     for tag in tags_to_create:
         create_tag(repo, tag, message=message, commit=commits[tag])
+        time.sleep(1)
 
-    assert get_version(repo).startswith("1.1")
+    if message:
+        # the result is not stable because latest tag (by creation time)
+        # has nothing in common with commit creation time
+        assert "1.1.10" in get_version(repo)
+    else:
+        assert get_version(repo).startswith("1.1")
+        # the result is totally random because annotaged tags have no such field at all
+        # https://github.com/dolfinus/setuptools-git-versioning/issues/23
 
 
 @pytest.mark.parametrize("sort_by", [None, "creatordate"])
