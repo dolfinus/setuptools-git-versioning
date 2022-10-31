@@ -1,4 +1,4 @@
 deprecated
 packaging
 setuptools
-toml>=0.10.2
+toml>=0.10.2; python_version<"3.11"

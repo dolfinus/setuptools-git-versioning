@@ -1,6 +1,32 @@
 Changelog
 ==========
 
+1.13
+----
+
+.. changelog::
+    :version: 1.13.0
+
+    .. change::
+        :tags: dependencies, feature
+
+        For Python 3.11 use built-in ``tomllib`` instead of ``toml`` package
+
+    .. change::
+        :tags: docs, feature
+
+        Add documentation about fetching package version in runtime
+
+    .. change::
+        :tags: core, breaking
+
+        Make all internal functions private
+
+    .. change::
+        :tags: docs, feature
+
+        Add description for some functions
+
 1.12
 ----
 

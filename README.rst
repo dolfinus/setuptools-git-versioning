@@ -49,7 +49,8 @@ between ``setuptools-git-versioning`` and other tools.
 
 - Only git v2 is supported
 
-- Currently does not support exporting version to file for runtime use
+- Currently does not support automatic exporting of package version to a file for runtime use
+  (but you can use ``setuptools-git-versioning > file`` redirect instead)
 
 .. documentation
 

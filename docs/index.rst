@@ -16,6 +16,7 @@
 
     install
     command
+    runtime_version
     schemas/index
     options/index
     substitutions/index

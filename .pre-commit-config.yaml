@@ -67,12 +67,11 @@ repos:
   rev: 5.0.4
   hooks:
   - id: flake8
-- repo: https://github.com/Lucas-C/pre-commit-hooks-bandit
-  rev: v1.0.6
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.7.4
   hooks:
-  - id: python-bandit-vulnerability-check
-    # TODO: remove line below after https://github.com/PyCQA/bandit/issues/488
-    args: [-lll, --recursive, -x, './venv/*,./tests/,./pytest_cache/*', .]
+  - id: bandit
+    args: [-c, bandit.yaml]
 - repo: meta
   hooks:
   - id: check-hooks-apply
