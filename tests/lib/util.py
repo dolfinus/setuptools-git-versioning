@@ -57,16 +57,17 @@ def create_commit(
         # The committer date is what is used to determine sort order for tags, etc
         os.environ["GIT_COMMITTER_DATE"] = dt.isoformat()
 
-    return_value = execute(cwd, f'git commit -m "{message}" {options}', **kwargs)
-
-    # Return committer date env var to prior value if set
-    if dt is not None:
-        if original_committer_date is None:
-            # unset the var
-            del os.environ["GIT_COMMITTER_DATE"]
-        else:
-            # restore previous value
-            os.environ["GIT_COMMITTER_DATE"] = original_committer_date
+    try:
+        return_value = execute(cwd, f'git commit -m "{message}" {options}', **kwargs)
+    finally:
+        # Return committer date env var to prior value if set
+        if dt is not None:
+            if original_committer_date is None:
+                # unset the var
+                del os.environ["GIT_COMMITTER_DATE"]
+            else:
+                # restore previous value
+                os.environ["GIT_COMMITTER_DATE"] = original_committer_date
 
     return return_value
 
