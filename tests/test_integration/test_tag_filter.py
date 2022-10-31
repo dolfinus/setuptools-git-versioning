@@ -30,7 +30,6 @@ pytestmark = pytest.mark.all
 def test_tag_filter(repo, create_config, tag_filter, version):
     create_config(repo, {"tag_filter": tag_filter, "tag_formatter": tag_filter})
 
-    commits = {}
     tags_to_commit = [
         "product_x/1.0.0",
         "product_x/1.0.2",
@@ -43,8 +42,7 @@ def test_tag_filter(repo, create_config, tag_filter, version):
         create_file(repo, commit=False)
         dt = datetime.now() - timedelta(days=10) + timedelta(days=i)
         create_commit(repo, "Some commit", dt=dt)
-        commits[tag] = get_sha(repo)
-        create_tag(repo, tag, message="", commit=commits[tag])
+        create_tag(repo, tag, message="", commit=get_sha(repo))
 
     assert get_version(repo).startswith(version)
 
