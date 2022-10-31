@@ -126,3 +126,14 @@ def test_tag_filter_missing_format(repo, create_config, tag, filter_regex):
 
     with pytest.raises(subprocess.CalledProcessError):
         get_version(repo)
+
+
+def test_tag_filter_invalid_regex(repo, create_config):
+    create_config(
+        repo,
+        {"tag_filter": "abc(.*"},
+    )
+    create_tag(repo, "1.0.0")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        get_version(repo)
