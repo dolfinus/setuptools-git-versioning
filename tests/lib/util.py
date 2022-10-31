@@ -55,7 +55,7 @@ def create_commit(
 
         options += f"--date {dt.isoformat()}"
         # The committer date is what is used to determine sort order for tags, etc
-        os.environ["GIT_COMMITTER_DATE"] = f"--date {dt.isoformat()}"
+        os.environ["GIT_COMMITTER_DATE"] = dt.isoformat()
 
     return_value = execute(cwd, f'git commit -m "{message}" {options}', **kwargs)
 
