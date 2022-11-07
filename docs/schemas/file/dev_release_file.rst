@@ -87,7 +87,7 @@ Release process
 
 .. warning::
 
-    Every change of this file in the ``dev`` branch will lead to this ``N`` suffix to be reset to ``0``. Update this file only in the case when you've setting up the next release version!
+    Every change of this file in the ``dev`` branch will lead to this ``N`` suffix to be reset to ``0``. Update this file only in the case when you're setting up the next release version!
 
 .. _dev-release-any-branch:
 
