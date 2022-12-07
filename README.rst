@@ -75,7 +75,8 @@ Install
 ~~~~~~~~~~~~~~~~~~
 
 Just add ``setuptools-git-versioning`` to ``build-sytem`` section of your ``pyproject.toml``,
-and a section ``tool.setuptools-git-versioning`` with config options:
+add a section ``tool.setuptools-git-versioning`` with config options, and mark the project 
+``version`` as dynamic.
 
 .. code:: toml
 
@@ -85,6 +86,9 @@ and a section ``tool.setuptools-git-versioning`` with config options:
 
     [tool.setuptools-git-versioning]
     enabled = true
+    
+    [project]
+    dynamic = ["version"]
 
 And check the package version generated (see `command help <https://setuptools-git-versioning.readthedocs.io/en/stable/command.html>`__):
 
