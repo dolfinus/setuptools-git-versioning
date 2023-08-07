@@ -30,6 +30,13 @@ def rand_sha() -> str:
 
 def execute(cwd: str | os.PathLike, cmd: str, **kwargs) -> str:
     log.info(f"Executing '{cmd}' at '{cwd}'")
+
+    if "env" in kwargs:
+        kwargs["env"]["PATH"] = os.environ["PATH"]
+        pythonpath = os.getenv("PYTHONPATH", None)
+        if pythonpath:
+            kwargs["env"]["PYTHONPATH"] = pythonpath
+
     return subprocess.check_output(cmd, cwd=cwd, shell=True, universal_newlines=True, **kwargs)  # nosec
 
 

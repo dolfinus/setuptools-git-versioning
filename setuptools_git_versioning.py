@@ -15,6 +15,11 @@ from pathlib import Path
 from pprint import pformat
 from typing import TYPE_CHECKING, Any, Callable
 
+# because we use distutils in this file, we need to ensure that setuptools is
+# imported first so that it can do monkey patching. this is not always already
+# done for us, for example, when running this in a test or as a module
+import setuptools  # noqa: F401
+
 if TYPE_CHECKING:
     # avoid importing 'packaging' because setuptools-git-versioning can be installed using sdist
     # where 'packaging' is not installed yet
