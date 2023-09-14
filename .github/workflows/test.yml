@@ -128,7 +128,7 @@ jobs:
         coverage xml -o reports/coverage.xml -i
 
     - name: Check coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: ./reports
