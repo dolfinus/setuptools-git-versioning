@@ -33,7 +33,7 @@ jobs:
         python-version: '3.11'
 
     - name: Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-python-${{ matrix.python-version }}-codeql-${{ hashFiles('requirements*.txt') }}
