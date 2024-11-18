@@ -85,6 +85,8 @@ jobs:
         with:
           name: code-coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.mark }}
           path: reports/.coverage*
+          # https://github.com/actions/upload-artifact/issues/602
+          include-hidden-files: true
 
   all_done:
     name: Tests done
