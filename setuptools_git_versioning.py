@@ -181,9 +181,10 @@ def _read_toml(name_or_path: str | os.PathLike = "pyproject.toml", root: str | o
         with file_path.open("rb") as file:
             parsed_file = tomllib.load(file)
     except (ImportError, NameError):
-        import toml  # type: ignore[no-redef]
+        import tomli
 
-        parsed_file = toml.load(file_path)
+        with file_path.open("rb") as file:
+            parsed_file = tomli.load(file)
 
     result = parsed_file.get("tool", {}).get("setuptools-git-versioning", None)
     if result:
