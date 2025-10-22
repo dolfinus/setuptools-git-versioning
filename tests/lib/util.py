@@ -10,7 +10,7 @@ from pathlib import Path
 from secrets import token_hex
 from typing import Any, Callable
 
-import toml
+import tomli_w
 
 log = logging.getLogger(__name__)
 root = Path(__file__).parent.parent
@@ -217,7 +217,7 @@ def create_pyproject_toml(
     if config != NotImplemented:
         cfg["tool"] = {"setuptools-git-versioning": config}
 
-    return create_file(cwd, "pyproject.toml", toml.dumps(cfg), commit=commit, **kwargs)
+    return create_file(cwd, "pyproject.toml", tomli_w.dumps(cfg), commit=commit, **kwargs)
 
 
 def create_setup_py(

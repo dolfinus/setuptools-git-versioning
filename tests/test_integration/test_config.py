@@ -3,7 +3,7 @@ import subprocess
 import textwrap
 
 import pytest
-import toml
+import tomli_w
 
 from tests.lib.util import (
     create_file,
@@ -66,7 +66,7 @@ def test_config_not_used(repo):
     create_file(
         repo,
         "pyproject.toml",
-        toml.dumps(cfg),
+        tomli_w.dumps(cfg),
     )
 
     assert get_version(repo, isolated=False) == "0.0.0"

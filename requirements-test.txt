@@ -2,5 +2,6 @@ build
 coverage
 pytest
 pytest-rerunfailures
-toml
+# Some tests need to write TOML, but tomli and tomllib are read-only, and toml package is unmaintained
+tomli-w
 wheel
