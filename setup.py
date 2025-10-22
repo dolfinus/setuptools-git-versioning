@@ -23,7 +23,7 @@ setup(
     version=version_from_git(root=here, dev_template="{tag}.post{ccount}"),
     author="dolfinus",
     author_email="martinov.m.s.8@gmail.com",
-    description="Use git repo data for building a version number according PEP-440",
+    description="Use git repo data for building a version number according to PEP-440",
     license="MIT",
     long_description=long_description,
     long_description_content_type="text/x-rst",
