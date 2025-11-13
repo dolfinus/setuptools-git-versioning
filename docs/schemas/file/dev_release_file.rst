@@ -77,7 +77,7 @@ Release process
 """""""""""""""
 
 -  Merge ``dev`` branch into ``master`` branch.
--  Tag commit in the ``master`` branch, and publis a repease from code on this branch.
+-  Tag commit in the ``master`` branch, and publish a release from code on this branch.
 -  Checkout back to ``dev`` branch
 -  Save next release version (e.g. ``1.2.0``) in ``VERSION`` or ``VERSION.txt`` file in the ``dev`` branch.
 -  Next commits to a ``dev`` branch will lead to returning this next release version plus dev suffix, like ``1.2.0.dev1`` or so.
