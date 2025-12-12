@@ -75,7 +75,7 @@ jobs:
           coverage run -m pytest -m ${{ matrix.mark }}
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: code-coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.mark }}
           path: reports/.coverage*
