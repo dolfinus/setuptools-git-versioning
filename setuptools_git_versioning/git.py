@@ -19,6 +19,11 @@ def _exec(*cmd: str, root: str | os.PathLike | None = None) -> list[str]:
         stdout = subprocess.check_output(cmd, text=True, cwd=root)  # noqa: S603
     except subprocess.CalledProcessError as e:
         stdout = e.output
+    except (FileNotFoundError, OSError) as e:
+        # Handle case where git executable is not found
+        # FileNotFoundError on Unix, OSError on some other systems
+        log.log(DEBUG, "Command not found: %r", e)
+        stdout = ""
     lines = stdout.splitlines()
     return [line.rstrip() for line in lines if line.rstrip()]
 
