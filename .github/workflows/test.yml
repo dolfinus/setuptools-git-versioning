@@ -61,7 +61,7 @@ jobs:
           coverage run --parallel-mode -m pytest -n auto -m ${{ matrix.mark }} --junitxml=reports/junit/${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.mark }}.xml
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.mark }}
           path: reports/*
