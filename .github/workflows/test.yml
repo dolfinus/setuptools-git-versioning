@@ -116,7 +116,7 @@ jobs:
           hide-comment: ${{ github.event_name != 'pull_request' }}
 
       - name: Dynamic Badges
-        uses: schneegans/dynamic-badges-action@v1.7.0
+        uses: schneegans/dynamic-badges-action@v1.8.0
         if: github.repository == 'dolfinus/setuptools-git-versioning' && github.event_name == 'push'
         with:
           auth: ${{ secrets.PERSONAL_TOKEN }}
