@@ -1,0 +1,1 @@
+Added a dynamic-metadata provider compatible with `scikit-build-core <https://scikit-build-core.readthedocs.io>`_.
