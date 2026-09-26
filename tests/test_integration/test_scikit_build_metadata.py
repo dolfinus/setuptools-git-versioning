@@ -1,18 +1,23 @@
 from __future__ import annotations
 
+import importlib
 import re
 import sys
 import textwrap
+import warnings
 from typing import TYPE_CHECKING, Any
 
 import pytest
 import tomli_w
 
-from setuptools_git_versioning import scikit_metadata as metadata
 from tests.lib.util import create_file, create_tag, execute
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    from setuptools_git_versioning import scikit_metadata as metadata
 
 pytestmark = [pytest.mark.all, pytest.mark.important]
 
@@ -62,7 +67,7 @@ def test_reads_project_name_from_pyproject(repo, monkeypatch):
         captured["package_name"] = package_name
         return Version("9.9.9")
 
-    monkeypatch.setattr(metadata, "version_from_git", fake_version_from_git)
+    monkeypatch.setattr("setuptools_git_versioning.dynamic_metadata.version_from_git", fake_version_from_git)
 
     assert metadata.dynamic_metadata("version") == "9.9.9"
     assert captured["package_name"] == "mypkg"
@@ -84,7 +89,7 @@ def test_no_project_section_means_no_package_name(repo, monkeypatch):
         captured["package_name"] = package_name
         return Version("0.0.1")
 
-    monkeypatch.setattr(metadata, "version_from_git", fake_version_from_git)
+    monkeypatch.setattr("setuptools_git_versioning.dynamic_metadata.version_from_git", fake_version_from_git)
 
     metadata.dynamic_metadata("version")
     assert captured["package_name"] is None
@@ -126,6 +131,11 @@ def test_rejects_enabled_false(repo, monkeypatch):
 def test_get_requires_for_dynamic_metadata():
     assert metadata.get_requires_for_dynamic_metadata() == ["setuptools-git-versioning"]
     assert metadata.get_requires_for_dynamic_metadata({"anything": True}) == ["setuptools-git-versioning"]
+
+
+def test_legacy_module_warns():
+    with pytest.warns(DeprecationWarning, match=r"migrate to \[\[tool\.dynamic-metadata\]\]"):
+        importlib.reload(metadata)
 
 
 def test_end_to_end_build_via_scikit_build_core(repo):

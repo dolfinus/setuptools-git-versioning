@@ -50,8 +50,8 @@ between ``setuptools-git-versioning`` and other tools.
 
 - Only Git v2 is supported
 
-- Setuptools and `scikit-build-core <https://scikit-build-core.readthedocs.io>`_ build backends are
-  supported (no Poetry & others)
+- Setuptools and build backends supporting `dynamic-metadata <https://dynamic-metadata.readthedocs.io>`_
+  (e.g. `scikit-build-core <https://scikit-build-core.readthedocs.io>`_ 1.0+) are supported.
 
 - Currently does not support automatic exporting of package version to a file for runtime use
   (but you can use ``setuptools-git-versioning > file`` redirect instead)
@@ -144,30 +144,29 @@ and then add new argument ``setuptools_git_versioning`` with config options:
 
 Commands are the same as above, plus ``python -m setup.py`` returns the same version.
 
-``scikit-build-core``
-~~~~~~~~~~~~~~~~~~~~~
+``dynamic-metadata``
+~~~~~~~~~~~~~~~~~~~~
 
-If your project uses the `scikit-build-core <https://scikit-build-core.readthedocs.io>`_ build backend,
-add ``setuptools-git-versioning`` to ``build-system.requires``,
-mark the ``version`` field as dynamic,
-register the dynamic-metadata provider,
-and configure options under the usual ``[tool.setuptools-git-versioning]`` section:
+For build backends supporting `dynamic-metadata <https://dynamic-metadata.readthedocs.io>`_ 0.4+,
+select the registered provider in ``[[tool.dynamic-metadata]]``. For example, with
+`scikit-build-core <https://scikit-build-core.readthedocs.io>`_ 1.0+:
 
 .. code:: toml
 
     [build-system]
-    requires = [ "scikit-build-core", "setuptools-git-versioning>=3.0,<4", ]
+    requires = [ "scikit-build-core>=1.0", "dynamic-metadata>=0.4", "setuptools-git-versioning>=3.0,<4", ]
     build-backend = "scikit_build_core.build"
 
     [project]
     name = "mypackage"
     dynamic = ["version"]
 
-    [tool.scikit-build.metadata.version]
-    provider = "setuptools_git_versioning.scikit_metadata"
+    [[tool.dynamic-metadata]]
+    provider = "setuptools_git_versioning.dynamic_metadata"
 
     [tool.setuptools-git-versioning]
     enabled = true
 
-All options under ``[tool.setuptools-git-versioning]`` work exactly as the for ``setuptools`` backend.
-Inline configuration under ``[tool.scikit-build.metadata.version]`` is not supported.
+The provider sets only ``version`` and reads options from ``[tool.setuptools-git-versioning]``.
+Inline settings in ``[[tool.dynamic-metadata]]`` are not supported.
+The provider itself has no runtime dependency on ``dynamic-metadata``.

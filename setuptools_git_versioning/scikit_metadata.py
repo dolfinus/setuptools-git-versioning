@@ -1,18 +1,25 @@
-"""Dynamic metadata provider for the scikit-build-core build backend."""
+"""Deprecated version provider for the classic scikit-build-core protocol."""
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from setuptools_git_versioning.defaults import set_default_options
-from setuptools_git_versioning.setup import read_toml
-from setuptools_git_versioning.version import version_from_git
+from setuptools_git_versioning.dynamic_metadata import dynamic_metadata as _dynamic_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
 __all__ = ["dynamic_metadata", "get_requires_for_dynamic_metadata"]
+
+warnings.warn(
+    "setuptools_git_versioning.scikit_metadata is deprecated; "
+    "migrate to [[tool.dynamic-metadata]] with provider = 'setuptools_git_versioning.dynamic_metadata' "
+    "on a backend supporting dynamic-metadata such as scikit-build-core>=1.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 def dynamic_metadata(
@@ -30,29 +37,7 @@ def dynamic_metadata(
         )
         raise ValueError(msg)
 
-    root = Path.cwd()
-
-    config = read_toml(root=root)
-    if not config:
-        msg = (
-            "Missing [tool.setuptools-git-versioning] section in pyproject.toml. "
-            "Add it (with at minimum 'enabled = true') to use this provider."
-        )
-        raise ValueError(msg)
-
-    if not config.pop("enabled", True):
-        msg = (
-            "[tool.setuptools-git-versioning] has 'enabled = false' but the scikit-build-core "
-            "metadata provider for setuptools-git-versioning was selected. "
-            "Either remove the provider or set 'enabled = true'."
-        )
-        raise ValueError(msg)
-
-    set_default_options(config)
-
-    package_name = _read_project_name(root)
-
-    return str(version_from_git(package_name, **config, root=root))
+    return _dynamic_metadata({}, {"name": _read_project_name(Path.cwd())})["version"]
 
 
 def _read_project_name(root: Path) -> str | None:

@@ -55,6 +55,9 @@ setuptools_git_versioning = "setuptools_git_versioning:infer_version"
 [project.entry-points."console_scripts"]
 setuptools-git-versioning = "setuptools_git_versioning.cli:main"
 
+[project.entry-points."dynamic_metadata.provider"]
+"setuptools_git_versioning.dynamic_metadata" = "setuptools_git_versioning.dynamic_metadata"
+
 [tool.setuptools.packages.find]
 include = ["setuptools_git_versioning*"]
 exclude = ["docs*", "tests*"]
@@ -79,6 +82,7 @@ test = [
   "tomli-w>=1.0.0",
   "wheel>=0.42.0",
   "scikit-build-core>=0.5",
+  "dynamic-metadata>=0.4; python_version >= '3.8'",
 ]
 docs = [
   "furo~=2025.12.19",
