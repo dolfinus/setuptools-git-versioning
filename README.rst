@@ -154,7 +154,7 @@ select the registered provider in ``[[tool.dynamic-metadata]]``. For example, wi
 .. code:: toml
 
     [build-system]
-    requires = [ "scikit-build-core>=1.0", "dynamic-metadata>=0.4", "setuptools-git-versioning>=3.0,<4", ]
+    requires = [ "scikit-build-core>=1.0", "dynamic-metadata>=0.4", "setuptools-git-versioning>=3.2,<4", ]
     build-backend = "scikit_build_core.build"
 
     [project]
