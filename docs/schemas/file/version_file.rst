@@ -66,8 +66,16 @@ of this file (``1.0.0``) will be returned instead default version number.
 
 **Please take into account that any tags in the repo are ignored if this option is being used.**
 
+.. note::
+
+    If you want the latest Git tag to take precedence over the version file
+    (for example, when a release tag like ``v2.1.0rc1`` is pushed but the
+    version file still contains ``2.1.0``), set the
+    :ref:`prefer-tag-option` option to ``true``.
+
 See also
 """""""""
 - :ref:`version-callback`
 - :ref:`version-file-option` option
+- :ref:`prefer-tag-option` option
 - :ref:`runtime-version`
