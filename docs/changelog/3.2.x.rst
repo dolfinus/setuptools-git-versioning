@@ -7,8 +7,11 @@ Features
 - Added support for ``dynamic-metadata`` 0.4+ through the ``setuptools_git_versioning.dynamic_metadata`` provider. (:github:pull:`161`)
 
   This enables automatic versioning with scikit-build-core 1.0+ and other compatible backends.
+  Thanks to :github:user:`ktbarrett`.
 
-- Added new ``prefer_tag: bool = False`` option for :ref:`version-file-option`. (:github:pull:`161`)
+- Added new ``prefer_tag: bool = False`` option for :ref:`version-file-option`. (:github:pull:`162`)
+
+  Thanks to :github:user:`lxcxjxhx`.
 
 Deprecation
 -----------
