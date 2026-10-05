@@ -186,11 +186,6 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
             else:
                 log.log(DEBUG, "File content: %r", file_tag)
 
-            if tag_formatter is not None:
-                tag_format_callback = create_tag_formatter(tag_formatter, package_name=package_name, root=root)
-                file_tag = tag_format_callback(file_tag)
-                log.log(DEBUG, "File content after formatting: %r", tag)
-
         if prefer_tag and file_tag and tag:
             log.log(
                 INFO,
