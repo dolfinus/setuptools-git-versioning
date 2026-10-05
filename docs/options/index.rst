@@ -13,6 +13,7 @@ Config options
     dirty_template
     version_file
     count_commits
+    prefer_tag
     version_callback
     sort_by
     branch_formatter

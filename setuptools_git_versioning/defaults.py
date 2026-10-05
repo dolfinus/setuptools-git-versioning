@@ -13,6 +13,7 @@ DEFAULT_CONFIG = {
     "version_callback": None,
     "version_file": None,
     "count_commits_from_version_file": False,
+    "prefer_tag": False,
     "tag_formatter": None,
     "branch_formatter": None,
     "tag_filter": None,

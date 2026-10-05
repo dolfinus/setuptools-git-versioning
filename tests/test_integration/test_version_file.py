@@ -312,3 +312,92 @@ def test_version_file_git_not_executable(repo, create_config, count_commits, tmp
     tmp_path = tmp_path_factory.mktemp("bin")
     tmp_path.joinpath("git").touch()
     assert get_version(repo, env={"PATH": os.fspath(tmp_path)}) == "1.0.0"
+
+
+@pytest.mark.flaky(reruns=3)  # sha and full_sha can start with 0 which are removed, just try again
+def test_version_file_prefer_tag_off_by_default(repo, create_config):
+    # without prefer_tag, the version file wins even when a tag is present
+    create_file(repo, "VERSION.txt", "1.0.0")
+    create_config(
+        repo,
+        {
+            "version_file": "VERSION.txt",
+            "count_commits_from_version_file": True,
+        },
+    )
+    create_tag(repo, "1.2.3")
+
+    assert get_version(repo) == "1.0.0"
+
+
+@pytest.mark.flaky(reruns=3)  # sha and full_sha can start with 0 which are removed, just try again
+@pytest.mark.parametrize("count_commits_from_version_file", [True, False])
+def test_version_file_prefer_tag_on_tagged_head(repo, create_config, count_commits_from_version_file):
+    # prefer_tag makes the tag win over the version file content on a tagged HEAD
+    create_file(repo, "VERSION.txt", "1.0.0")
+    create_config(
+        repo,
+        {
+            "version_file": "VERSION.txt",
+            "count_commits_from_version_file": count_commits_from_version_file,
+            "prefer_tag": True,
+        },
+    )
+    create_tag(repo, "1.2.3")
+
+    assert get_version(repo) == "1.2.3"
+
+
+@pytest.mark.flaky(reruns=3)  # sha and full_sha can start with 0 which are removed, just try again
+def test_version_file_prefer_tag_dev_commits(repo, create_config):
+    # prefer_tag + commits after the tag: tag is used as the version source,
+    # dev template kicks in because HEAD is not on the tag
+    create_file(repo, "VERSION.txt", "1.0.0")
+    create_config(
+        repo,
+        {
+            "version_file": "VERSION.txt",
+            "count_commits_from_version_file": True,
+            "prefer_tag": True,
+        },
+    )
+    create_tag(repo, "1.2.3")
+    # create_file with default add=True/commit=True creates the commit after the tag
+    create_file(repo, "work.txt", "work after tag")
+
+    sha = get_sha(repo)
+    assert get_version(repo) == f"1.2.3.post1+git.{sha}"
+
+
+@pytest.mark.flaky(reruns=3)  # sha and full_sha can start with 0 which are removed, just try again
+def test_version_file_prefer_tag_without_any_tag(repo, create_config):
+    # prefer_tag with no tags in the repo: version file is still the source
+    # (count_commits_from_version_file is off here so the file content is
+    # returned as-is, without the dev suffix)
+    create_file(repo, "VERSION.txt", "1.0.0")
+    create_config(
+        repo,
+        {
+            "version_file": "VERSION.txt",
+            "prefer_tag": True,
+        },
+    )
+
+    assert get_version(repo) == "1.0.0"
+
+
+@pytest.mark.flaky(reruns=3)  # sha and full_sha can start with 0 which are removed, just try again
+def test_version_file_prefer_tag_v_prefix(repo, create_config):
+    # tag with a "v" prefix is compared to the version file without the prefix
+    create_file(repo, "VERSION.txt", "1.2.3")
+    create_config(
+        repo,
+        {
+            "version_file": "VERSION.txt",
+            "count_commits_from_version_file": True,
+            "prefer_tag": True,
+        },
+    )
+    create_tag(repo, "v1.2.3")
+
+    assert get_version(repo) == "1.2.3"

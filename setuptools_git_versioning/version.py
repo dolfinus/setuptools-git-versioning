@@ -5,7 +5,7 @@ import logging
 import os  # noqa: TC003
 import re
 from pathlib import Path
-from typing import Callable
+from typing import Callable, cast
 
 # avoid importing 'packaging' because setuptools-git-versioning can be installed using sdist
 # where 'packaging' is not installed yet
@@ -96,6 +96,7 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
     version_callback: str | Callable[[], str] | None = None,
     version_file: str | os.PathLike | None = None,
     count_commits_from_version_file: bool = False,
+    prefer_tag: bool = False,
     tag_formatter: Callable[[str], str] | str | None = None,
     branch_formatter: Callable[[str], str] | str | None = None,
     tag_filter: Callable[[str], str | None] | str | None = None,
@@ -134,6 +135,9 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
             raise ValueError(msg)
         return get_version_from_callback(version_callback, package_name, root=root)
 
+    ccount: int | None = 0
+    on_tag = False
+    tag_sha = None
     head_sha = get_sha(root=root)
     log.log(INFO, "HEAD SHA-256: %r", head_sha)
 
@@ -146,14 +150,20 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
     tag = get_tag(sort_by=sort_by, root=root, filter_callback=filter_callback)
     if not tag:
         log.log(INFO, "No tags found")
-        tag_sha = None
-        on_tag = False
     else:
-        tag_sha = get_sha(tag, root=root)
+        tag_sha = cast("str", get_sha(tag, root=root))
         log.log(INFO, "Tag SHA-256: %r", tag_sha)
 
         on_tag = head_sha is not None and head_sha == tag_sha
         log.log(INFO, "HEAD is tagged: %r", on_tag)
+
+        ccount = count_since(tag_sha, root=root)
+        log.log(INFO, "Commits count between HEAD and last tag: %r", ccount)
+
+        if tag_formatter is not None:
+            tag_format_callback = create_tag_formatter(tag_formatter, package_name=package_name, root=root)
+            tag = tag_format_callback(tag)
+            log.log(DEBUG, "Tag after formatting: %r", tag)
 
     if version_file:
         log.log(INFO, "Checking for 'version_file'")
@@ -166,35 +176,44 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
                 version_file_path,
                 starting_version,
             )
-            tag = None
+            file_tag = None
         else:
             log.log(INFO, "Reading version_file '%s' content", version_file)
-            tag = version_file_path.read_text().strip() or None
+            file_tag = version_file_path.read_text().strip() or None
 
-            if not tag:
+            if not file_tag:
                 log.log(INFO, "File %r is empty", version_file)
             else:
-                log.log(DEBUG, "File content: %r", tag)
-                if not count_commits_from_version_file:
-                    return sanitize_version(tag)
+                log.log(DEBUG, "File content: %r", file_tag)
 
-                file_sha = get_latest_file_commit(version_file, root=root)
-                log.log(DEBUG, "File SHA-256: %r", file_sha)
+        if prefer_tag and file_tag and tag:
+            log.log(
+                INFO,
+                "Both 'version_file' and a Git tag (%r) are present, and 'prefer_tag' is enabled: using the tag",
+                tag,
+            )
+            if file_tag and sanitize_version(file_tag) != sanitize_version(tag):
+                log.warning(
+                    "Git tag %r and 'version_file' content %r are different: using the tag. "
+                    "Update the version file to silence this warning",
+                    tag,
+                    file_tag,
+                )
 
-                ccount = count_since(file_sha, root=root) if file_sha else None
-                log.log(INFO, "Commits count between HEAD and last version file change: %r", ccount)
+        elif file_tag:
+            tag = file_tag
+
+            if not count_commits_from_version_file:
+                return sanitize_version(tag)
+
+            file_sha = get_latest_file_commit(version_file, root=root)
+            log.log(DEBUG, "File SHA-256: %r", file_sha)
+
+            ccount = count_since(file_sha, root=root) if file_sha else None
+            log.log(INFO, "Commits count between HEAD and last version file change: %r", ccount)
 
     elif not head_sha:
         log.log(INFO, "Not a git repo, or repo without any branch")
-
-    elif tag_sha:
-        ccount = count_since(tag_sha, root=root)
-        log.log(INFO, "Commits count between HEAD and last tag: %r", ccount)
-
-        if tag_formatter is not None:
-            tag_format_callback = create_tag_formatter(tag_formatter, package_name=package_name, root=root)
-            tag = tag_format_callback(tag)
-            log.log(DEBUG, "Tag after formatting: %r", tag)
 
     if not tag:
         log.log(INFO, "No source for version, return starting_version %r", starting_version)
