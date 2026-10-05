@@ -186,9 +186,6 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
             else:
                 log.log(DEBUG, "File content: %r", file_tag)
 
-            ccount = count_since(tag_sha, root=root) if tag_sha else None
-            log.log(INFO, "Commits count between HEAD and last tag: %r", ccount)
-
             if tag_formatter is not None:
                 tag_format_callback = create_tag_formatter(tag_formatter, package_name=package_name, root=root)
                 file_tag = tag_format_callback(file_tag)
