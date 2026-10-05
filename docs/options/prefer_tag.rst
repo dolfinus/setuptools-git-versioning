@@ -6,7 +6,7 @@
 Used together with the :ref:`version-file-option` option.
 
 By default, when :ref:`version-file-option` is set, any tags in the repo are
-ignored (see :issue:`155`). With this option enabled, the latest Git tag takes precedence over the version file content.
+ignored (see :github:issue:`155`). With this option enabled, the latest Git tag takes precedence over the version file content.
 
 .. note::
 

@@ -1,1 +1,0 @@
-Deprecated the ``setuptools_git_versioning.scikit_metadata`` provider. Migrate to ``[[tool.dynamic-metadata]]`` with ``provider = "setuptools_git_versioning.dynamic_metadata"`` on scikit-build-core 1.0+ or another compatible backend.

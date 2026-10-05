@@ -1,0 +1,18 @@
+3.2.0 (2026-10-05)
+==================
+
+Features
+--------
+
+- Added support for ``dynamic-metadata`` 0.4+ through the ``setuptools_git_versioning.dynamic_metadata`` provider. (:github:pull:`161`)
+
+  This enables automatic versioning with scikit-build-core 1.0+ and other compatible backends.
+
+- Added new ``prefer_tag: bool = False`` option for :ref:`version-file-option`. (:github:pull:`161`)
+
+Deprecation
+-----------
+
+- Deprecated the ``setuptools_git_versioning.scikit_metadata`` provider. (:github:pull:`161`)
+
+  Migrate to ``[[tool.dynamic-metadata]]`` with ``provider = "setuptools_git_versioning.dynamic_metadata"`` on scikit-build-core 1.0+ or another compatible backend.

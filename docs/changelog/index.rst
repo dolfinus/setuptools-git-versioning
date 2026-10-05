@@ -3,6 +3,7 @@
     :caption: Changelog
 
     DRAFT
+    3.2.x
     3.1.x
     3.0.x
     2.1.x
