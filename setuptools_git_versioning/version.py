@@ -135,7 +135,7 @@ def version_from_git(  # noqa: PLR0915, PLR0912, PLR0913, C901
             raise ValueError(msg)
         return get_version_from_callback(version_callback, package_name, root=root)
 
-    ccount = 0
+    ccount: int | None = 0
     on_tag = False
     tag_sha = None
     head_sha = get_sha(root=root)
