@@ -114,7 +114,7 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ARG", "ANN", "A002", "COM812", "D", "TD", "FIX002", "PLC0415"]
+ignore = ["ARG", "ANN", "A002", "COM812", "D", "TD", "FIX002", "PLC0415", "CPY001"]
 
 [tool.ruff.lint.per-file-ignores]
 "docs/conf.py" = ["INP001"]

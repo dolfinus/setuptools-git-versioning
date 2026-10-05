@@ -261,7 +261,7 @@ def create_setup_py(
     )
 
 
-def typed_config(  # noqa: PLR0913
+def typed_config(  # noqa: PLR0913, PLR0917
     repo: str | os.PathLike,
     config_creator: Callable,
     config_type: str,
