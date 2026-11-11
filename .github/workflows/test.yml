@@ -52,8 +52,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          activate-environment: "true"
-          enable-cache: "false"
+          activate-environment: 'true'
+          enable-cache: 'false'
 
       - name: Install dependencies
         run: |
@@ -107,7 +107,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          enable-cache: "false"
+          enable-cache: 'false'
 
       - name: Combine coverage
         run: |

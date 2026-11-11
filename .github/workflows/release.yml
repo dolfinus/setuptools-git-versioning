@@ -35,7 +35,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          enable-cache: "false"
+          enable-cache: 'false'
 
       - name: Fix version number
       # Fix for https://github.com/dolfinus/setuptools-git-versioning/issues/72#issuecomment-1312589464

@@ -16,6 +16,50 @@ env:
   DEFAULT_PYTHON: '3.14'
 
 jobs:
+  linters:
+    name: Linters
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: 'true'
+          enable-cache: 'false'
+
+      # astral-sh/setup-uv cannot restore multiple keys
+      - name: Cache uv
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-python${{ env.DEFAULT_PYTHON }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python${{ env.DEFAULT_PYTHON }}-${{ hashFiles('uv.lock') }}
+            ${{ runner.os }}-python${{ env.DEFAULT_PYTHON }}-
+
+      - name: Install dependencies
+        run: |
+          uv sync --group dev
+
+      - name: Run linters
+        run: |
+          uv run ruff format --check
+          uv run ruff check
+          uv run -m mypy setuptools_git_versioning
+
   codeql:
     name: CodeQL
     runs-on: ubuntu-latest

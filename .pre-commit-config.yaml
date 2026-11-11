@@ -26,10 +26,6 @@ repos:
         priority: 0
       - id: end-of-file-fixer
         priority: 1
-      - id: mixed-line-ending
-        args: [--fix=lf]
-        types: [python]
-        priority: 1
       - id: fix-byte-order-marker
         priority: 2
       - id: trailing-whitespace
@@ -45,6 +41,15 @@ repos:
       - id: rst-inline-touching-normal
         priority: 0
 
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: forbid-tabs
+        priority: 0
+      - id: remove-tabs
+        args: [--whitespaces-count, '2']
+        priority: 4
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
@@ -57,27 +62,38 @@ repos:
     rev: v2.16.0
     hooks:
       - id: pretty-format-yaml
-        args: [--autofix, --indent, '2', --preserve-quotes, --offset, '2']
+        args: [--autofix, --indent, '2', --offset, '2']
         priority: 5
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: "0.12.23"
+    rev: 0.13.7
     hooks:
       - id: uv-lock
         priority: 5
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.10
+  - repo: local
     hooks:
       - id: ruff-format
+        name: ruff-format
+        language: system
+        entry: ruff format .
+        types: [python]
+        pass_filenames: false
         priority: 5
+
       - id: ruff-check
-        args: [--fix]
+        name: ruff-check
+        language: system
+        entry: ruff check --fix
+        types: [python]
+        pass_filenames: false
         priority: 6
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.4.0
-    hooks:
       - id: mypy
-        additional_dependencies: [types-toml]
+        name: mypy
+        entry: mypy setuptools_git_versioning
+        language: python
+        types: [python]
+        require_serial: true
+        pass_filenames: false
         priority: 7
