@@ -97,3 +97,9 @@ repos:
         require_serial: true
         pass_filenames: false
         priority: 7
+
+ci:
+  skip:
+    - mypy # checked with Github Actions
+    - ruff-format # checked with Github Actions
+    - ruff-check # checked with Github Actions
