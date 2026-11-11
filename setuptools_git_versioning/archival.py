@@ -25,8 +25,8 @@ if TYPE_CHECKING:
 ARCHIVAL_FILENAME = ".git_archival.txt"
 DESCRIBE_UNSUPPORTED = "%(describe"
 FORMAT_UNSUBSTITUTED = "$Format"
-DESCRIBE_PARTS = 3  # tag-N-gSHA
 
+DESCRIBE_RE = re.compile(r"^(?P<tag>.+)-(?P<ccount>[0-9]+)-g(?P<sha>[0-9a-f]+)$")  # tag-N-gSHA
 REF_TAG_RE = re.compile(r"(?<=\btag: )([^,]+)\b")
 REF_HEAD_RE = re.compile(r"HEAD\s*->\s*([^,]+)")
 FULL_SHA_RE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$")  # SHA-1 or SHA-256
@@ -74,18 +74,14 @@ def _parse_describe(describe: str) -> tuple[str, int, str | None, bool]:
         dirty = True
         describe = describe[: -len("-dirty")]
 
-    parts = describe.rsplit("-", 2)
-    if len(parts) < DESCRIBE_PARTS:
+    # On a tagged commit, `git describe` prints the bare tag. Only split off
+    # the suffix when it really is `-N-gSHA`, so that tags like `2024-01-15`
+    # are not mistaken for a tag followed by a commit count and a SHA.
+    match = DESCRIBE_RE.match(describe)
+    if not match:
         return describe, 0, None, dirty
 
-    tag, ccount_str, gnode = parts
-    try:
-        ccount = int(ccount_str)
-    except ValueError:
-        return describe, 0, None, dirty
-
-    short_sha = gnode[1:] if gnode.startswith("g") else gnode
-    return tag, ccount, short_sha, dirty
+    return match.group("tag"), int(match.group("ccount")), match.group("sha"), dirty
 
 
 def _branch_from_ref_names(ref_names: str) -> str | None:
