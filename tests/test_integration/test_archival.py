@@ -221,6 +221,34 @@ def test_archival_to_version_data_describe_with_non_numeric_middle_part() -> Non
     assert result.ccount == 0
 
 
+@pytest.mark.parametrize("tag", ["2024-01-15", "v2024-01-15", "1.2.3-4-gamma"])
+def test_archival_to_version_data_bare_tag_resembling_describe_suffix(tag: str) -> None:
+    """For a commit exactly on a tag, describe-name is the bare tag. A tag
+    whose last two hyphen-separated parts merely resemble the `-N-gSHA`
+    suffix (e.g., a date) must not be split into tag, ccount and SHA.
+    """
+    data = {
+        "node": "4060507deadbeef0123456789abcdef012345678",
+        "describe-name": tag,
+    }
+    result = get_data_from_archival_file(data)
+    assert result is not None
+    assert result.tag == tag
+    assert result.ccount == 0
+    assert result.sha == "4060507d"
+
+
+def test_archival_to_version_data_hyphenated_tag_post_tag() -> None:
+    data = {
+        "node": "4060507deadbeef0123456789abcdef012345678",
+        "describe-name": "2024-01-15-3-g4060507",
+    }
+    result = get_data_from_archival_file(data)
+    assert result is not None
+    assert result.tag == "2024-01-15"
+    assert result.ccount == 3
+
+
 def test_archival_to_version_data_short_sha_fallback_when_node_missing() -> None:
     """When `node` is absent/invalid, full_sha should fall back to the
     short SHA from describe-name (best-effort)."""
@@ -423,6 +451,24 @@ def test_archival_end_to_end_bare_tag(repo: Path, tmp_path_factory: pytest.TempP
     shutil.copy(repo / ".coveragerc", extracted / ".coveragerc")
 
     assert get_version(extracted) == "1.2.3"
+
+
+@pytest.mark.important
+def test_archival_end_to_end_bare_hyphenated_tag(
+    repo: Path,
+    tmp_path_factory: pytest.TempPathFactory,
+    create_config,
+) -> None:
+    create_config(repo, {"template": "{tag}"})
+    _add_archival_template(repo)
+    create_tag(repo, "2024-01-15")
+    assert get_version(repo) == "2024.1.15"
+
+    extracted = tmp_path_factory.mktemp("extracted")
+    _git_archive_extract(repo, extracted)
+    shutil.copy(repo / ".coveragerc", extracted / ".coveragerc")
+
+    assert get_version(extracted) == "2024.1.15"
 
 
 @pytest.mark.important
