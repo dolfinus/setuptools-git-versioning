@@ -1,8 +1,28 @@
-3.2.0 (2026-10-05)
-==================
+3.2.x
+=====
+
+3.2.1 (2026-11-11)
+-------------------
 
 Features
---------
+~~~~~~~~
+
+Declare Python 3.15 support.
+
+Bug Fixes
+~~~~~~~~~
+
+Fixed version detection from ``.git_archival.txt`` when the archived commit is on a tag like ``2024-01-15``. (:github:pull:`168`)
+
+The tag was parsed as ``2024`` plus one commit, giving ``2024.post1+git.<sha>`` instead of ``2024.1.15``.
+Thanks to :github:user:`TohruSu`.
+
+
+3.2.0 (2026-10-05)
+-------------------
+
+Features
+~~~~~~~~
 
 - Added support for ``dynamic-metadata`` 0.4+ through the ``setuptools_git_versioning.dynamic_metadata`` provider. (:github:pull:`161`)
 
@@ -14,7 +34,7 @@ Features
   Thanks to :github:user:`lxcxjxhx`.
 
 Deprecation
------------
+~~~~~~~~~~~
 
 - Deprecated the ``setuptools_git_versioning.scikit_metadata`` provider. (:github:pull:`161`)
 

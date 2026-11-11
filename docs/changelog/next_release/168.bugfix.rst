@@ -1,1 +1,0 @@
-Fixed version detection from ``.git_archival.txt`` when the archived commit is on a tag like ``2024-01-15``. The tag was parsed as ``2024`` plus one commit, giving ``2024.post1+git.<sha>`` instead of ``2024.1.15``.
