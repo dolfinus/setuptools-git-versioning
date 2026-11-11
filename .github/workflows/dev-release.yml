@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  DEFAULT_PYTHON: '3.14'
+  DEFAULT_PYTHON: '3.15'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
