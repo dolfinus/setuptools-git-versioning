@@ -1,9 +1,10 @@
 import re
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
+from setuptools_git_versioning import subst
 from tests.lib.util import (
     checkout_branch,
     create_file,
@@ -130,9 +131,9 @@ def test_substitution_env(repo, dev_template, pipeline_id, suffix):
 @pytest.mark.parametrize(
     ("template", "fmt", "callback"),
     [
-        ("{tag}.post{timestamp}", "{tag}.post{}", lambda dt: (int(dt.strftime("%s")) // 100,)),
-        ("{tag}.post{timestamp:}", "{tag}.post{}", lambda dt: (int(dt.strftime("%s")) // 100,)),
-        ("{tag}.post{timestamp:%s}", "{tag}.post{}", lambda dt: (int(dt.strftime("%s")) // 100,)),
+        ("{tag}.post{timestamp}", "{tag}.post{}", lambda dt: (int(dt.timestamp()) // 100,)),
+        ("{tag}.post{timestamp:}", "{tag}.post{}", lambda dt: (int(dt.timestamp()) // 100,)),
+        ("{tag}.post{timestamp:%s}", "{tag}.post{}", lambda dt: (int(dt.timestamp()) // 100,)),
         (
             "{timestamp:%Y}.{timestamp:%m}.{timestamp:%d}+{timestamp:%H%M%S}",
             "{}.{}.{}+{}",
@@ -163,6 +164,39 @@ def test_substitution_timestamp(repo, template, fmt, callback):
         value = new_value
 
     assert new_value in get_version_setup_py(repo)
+
+
+class DatetimeWithoutUnixFormat(datetime):
+    """Fixed current time, and strftime rejects ``%s`` like on Windows."""
+
+    @classmethod
+    def now(cls, tz=None):
+        return cls(2024, 1, 15, 12, 34, 56, tzinfo=timezone.utc)
+
+    def astimezone(self, tz=None):
+        return self
+
+    def strftime(self, fmt):
+        if "%s" in fmt:
+            msg = "Invalid format string"
+            raise ValueError(msg)
+        return super().strftime(fmt)
+
+
+@pytest.mark.parametrize(
+    ("template", "result"),
+    [
+        ("{timestamp}", "1705322096"),
+        ("{timestamp:}", "1705322096"),
+        ("{timestamp:%s}", "1705322096"),
+        ("{tag}.post{timestamp}", "{tag}.post1705322096"),
+        ("{timestamp:%Y}.{timestamp:%m}", "2024.01"),
+    ],
+)
+def test_substitution_timestamp_without_strftime_unix_format(monkeypatch, template, result):
+    monkeypatch.setattr(subst, "datetime", DatetimeWithoutUnixFormat)
+
+    assert subst.substitute_timestamp(template) == result
 
 
 @pytest.mark.parametrize(

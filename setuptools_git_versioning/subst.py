@@ -43,7 +43,8 @@ def substitute_timestamp(template: str) -> str:
         format_string = fmt or "%s"
         log.log(DEBUG, "Format: %r", format_string)
 
-        result = now.strftime(format_string)
+        # strftime("%s") is platform-specific and fails on Windows
+        result = str(int(now.timestamp())) if format_string == "%s" else now.strftime(format_string)
         log.log(DEBUG, "Value: %r", result)
 
         template, _ = TIMESTAMP_REGEXP.subn(result, template, count=1)
