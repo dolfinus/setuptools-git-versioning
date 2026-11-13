@@ -1,3 +1,0 @@
-Fixed ``{timestamp}``, ``{timestamp:}`` and ``{timestamp:%s}`` substitutions failing on Windows with ``ValueError: Invalid format string``.
-
-``%s`` is not supported by ``strftime`` on every platform, so the unix timestamp is now computed directly.
