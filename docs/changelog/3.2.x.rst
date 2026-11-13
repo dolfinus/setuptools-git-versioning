@@ -7,9 +7,10 @@
 Bug Fixes
 ~~~~~~~~~
 
-Fixed ``{timestamp}``, ``{timestamp:}`` and ``{timestamp:%s}`` substitutions failing on Windows with ``ValueError: Invalid format string``.
+Fixed ``{timestamp}``, ``{timestamp:}`` and ``{timestamp:%s}`` substitutions failing on Windows. (:github:pull:`169`)
 
-``%s`` is not supported by ``strftime`` on every platform, so the unix timestamp is now computed directly.
+``%s`` can be not supported by ``strftime`` on some platforms, including Windows, raising ``ValueError: Invalid format string``.
+Now the unix timestamp is computed directly as ``datetime.timestamp()``.
 
 Thanks to :github:user:`TohruSu`.
 
