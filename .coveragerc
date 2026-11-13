@@ -1,6 +1,7 @@
 [run]
-branch = True
+branch = true
 source_pkgs = setuptools_git_versioning
+relative_files = true
 omit =
     tests/*
 parallel = true
