@@ -33,6 +33,12 @@ jobs:
           - os: ubuntu-latest
             mark: all
             python-version: '3.15'
+          - os: windows-latest
+            mark: all
+            python-version: '3.15'
+          - os: macos-latest
+            mark: all
+            python-version: '3.15'
         # run only minimal set of tests on other Python versions because it takes too much time
           - os: ubuntu-22.04
             mark: important
