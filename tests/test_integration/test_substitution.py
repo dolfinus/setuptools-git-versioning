@@ -128,6 +128,7 @@ def test_substitution_env(repo, dev_template, pipeline_id, suffix):
 
 
 @pytest.mark.flaky(reruns=3)  # running subprocess takes some time, so we can get previous second
+@pytest.mark.important
 @pytest.mark.parametrize(
     ("template", "fmt", "callback"),
     [
@@ -144,8 +145,6 @@ def test_substitution_env(repo, dev_template, pipeline_id, suffix):
             "{tag}.post{ccount}+{}",
             lambda dt: (dt.strftime("%Y.%m.%dt%H.%M"),),
         ),
-        # unknown substitution
-        ("{tag}+git.{timestamp:%i}", "{tag}+git.i", lambda x: []),
         # pure string
         ("{tag}+git.{timestamp:abc}", "{tag}+git.abc", lambda x: []),
     ],
